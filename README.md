@@ -9,6 +9,8 @@ The **Shub–Smale $`\tau`$-conjecture** (Smale's 4th Problem) asserts that the 
 In August 2026, Santibáñez-Leal established the exact census $`z_{\max}(1 \dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)`$ together with $`z_{\max}(10) \ge 7`$, and in an updated revision ruled out 9-gate SLPs ending in a multiplication gate — leaving open whether additive or subtractive final gates at $`\tau = 9`$ can achieve 7 distinct integer roots.
 
 > **Honest scope note:** This work does **not** resolve P vs NP or the full asymptotic $`\tau`$-conjecture. It settles the unrestricted $`\tau = 9`$ frontier unconditionally over all of $`\mathbb{Z}`$, introduces new finite-$`\tau`$ record witnesses for $`\tau = 11, 12, 13, 15`$, and provides a zero-`sorry` Lean 4.36.0 formalization.
+>
+> **AI & provenance disclosure:** This entire repository (Lean 4 formalization, C/Python certifiers, and LaTeX draft) was vibe-coded as an experimental spike test of the **Antigravity Harness + Gemini 4 Neon**. No human mathematician hand-verified the prose or C search code beyond automated checks; all Lean 4 proofs are kernel-checked (`0 sorryAx`, standard axioms only), and all code is open here for independent auditing and reproduction.
 
 ---
 
