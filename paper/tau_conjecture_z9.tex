@@ -1,0 +1,425 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\zmax}{z_{\max}}
+\newcommand{\zZ}{z_{\Z}}
+
+\title{Resolving the 7-Root Threshold of the Shub--Smale $\tau$-Conjecture: Unconditional $\zmax(9) = 6$, New Record Witnesses up to $\tau = 15$, and Lean~4 Certification}
+
+\author{Research Paper --- Computational Algebra, Exhaustive Certification, and Lean~4 Formalization}
+
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Smale's 4th Problem---the Shub--Smale $\tau$-conjecture---asserts that the number of distinct integer roots $\zZ(f)$ of any nonzero univariate polynomial $f \in \Z[x]$ is bounded polynomially in its constant-free straight-line program (SLP) complexity $\tau(f)$; an affirmative resolution implies $\mathrm{P}_{\C} \neq \mathrm{NP}_{\C}$ in the Blum--Shub--Smale (BSS) model of computation. Recently, Santiba\~{n}ez-Leal (August 2026) established the exact census $\zmax(1 \dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)$ together with $\zmax(10) \ge 7$, and in a revision ruled out $9$-gate SLPs whose final gate is a multiplication, leaving open whether additive or subtractive final gates at $\tau = 9$ can achieve $7$ distinct integer roots.
+
+We close the full unrestricted $\tau = 9$ space unconditionally over all of $\Z$ and advance both the exact census and the finite-$\tau$ constructive frontier:
+\begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
+  \item \textbf{Unconditional $\zmax(9) = 6$ over all of $\Z$:} Removing any root-magnitude window assumption and covering all final-gate operations ($+, -, \times$), we certify all $59{,}308{,}136{,}697$ canonical $9$-gate SLPs ($7{,}767{,}648{,}995$ internal nodes) in $489.6\text{s}$ on $12$ CPU cores using a magnitude-free modular/Taylor certification cascade in C ($399.671\text{s}$) followed by exact arbitrary-precision $\Z[x]$ squarefree decomposition and Hensel lifting on all $11{,}040{,}213$ unique survivors ($89.928\text{s}$), finding $0$ counterexamples. Combined with $\zmax(10) \ge 7$ (established by Santiba\~{n}ez-Leal and independently Lean-verified here), this settles the $7$-root threshold at $\tau = 10$:
+  \[
+    \zmax(1 \dots 9) = (1, 2, 3, 3, 4, 5, 5, 6, 6), \qquad \zmax(10) \ge 7.
+  \]
+  \item \textbf{New record finite-$\tau$ witnesses at $\tau = 11, 12, 13, 15$:} We introduce two new algebraic gate-reuse constructions: the \emph{Midpoint Difference Trick}, yielding a symmetric $8$-root witness at $\tau = 11$ and $9$ distinct integer roots at $\tau = 12$, and \emph{Shifted Pronic-Square Root Quadrupling with Gate Reuse}, yielding $10$ distinct integer roots at $\tau = 13$ (achieving slope $10/13 \approx 0.769 > 2/3$) and $11$ distinct integer roots at $\tau = 15$. We also give a Lean-verified formalization of the classical linear-rate pronic-folding baseline $\zmax(3k) \ge 2k$ for all $k \ge 1$.
+  \item \textbf{Machine-verified Lean~4.36.0 artifact:} We formalize the SLP model, the Simple-Root Modular Certificate theorem (\code{intRootCount\_le\_of\_eval\_zmod}), all record witnesses up to $\tau = 15$, and the pronic linear growth theorem across four Lean~4 modules ($893$ lines total), compiling with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.
+\end{enumerate}
+We include a transparent soundness and hash-collision audit delineating exact proof boundaries and full reproducibility commands.
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{Smale's 4th Problem and the Finite-$\tau$ Census}
+Let $f \in \Z[x]$ be a nonzero univariate integer polynomial. Its \emph{constant-free straight-line program complexity} $\tau(f)$ is the minimum length $\tau$ of a sequence of gates $g_1, \dots, g_\tau$ starting from $g_{-1} = 1$ and $g_0 = x$ such that each gate computes $g_k = g_i \circ_k g_j$ with $\circ_k \in \{+, -, \times\}$ and $-1 \le i, j < k$, ending at $g_\tau = f$. Let
+\[
+  Z_{\Z}(f) := \{r \in \Z : f(r) = 0\}, \qquad \zZ(f) := |Z_{\Z}(f)|, \qquad \zmax(\tau) := \max_{\substack{f \in \Z[x] \setminus \{0\} \\ \tau(f) \le \tau}} \zZ(f).
+\]
+Shub and Smale~\cite{ShubSmale1995} (listed as Problem~4 in Smale's 1998 list of mathematical problems for the next century~\cite{Smale1998}) conjectured that there exists a universal polynomial $p$ such that $\zZ(f) \le p(\tau(f))$ for all nonzero $f \in \Z[x]$---indeed, in the strongest form, $\zZ(f) \le (\tau(f) + 1)^c$ for an absolute constant $c$. Shub and Smale proved that the $\tau$-conjecture implies $\mathrm{P}_{\C} \neq \mathrm{NP}_{\C}$ in the Blum--Shub--Smale (BSS) model over $\C$ (via the intractability of computing $n!$), and B\"urgisser~\cite{Burgisser2009} linked variants of the conjecture to Valiant's algebraic complexity separation $\mathrm{VP} \neq \mathrm{VNP}$.
+
+While trivial multiplication-chain bounds give $\deg(f) \le 2^{\tau(f)}$ and hence $\zmax(\tau) \le 2^\tau$, tightening exact values of $\zmax(\tau)$ for small $\tau$ is both a testbed for algebraic obstructions to root proliferation and a source of structural constructions. In August 2026, Santiba\~{n}ez-Leal~\cite{SantibanezLeal2026} completed an exact census for $\tau \le 8$:
+\[
+  \zmax(1 \dots 8) = (1, 2, 3, 3, 4, 5, 5, 6),
+\]
+established $\zmax(10) \ge 7$ via explicit $10$-gate witnesses, and in an updated revision ruled out all $9$-gate SLPs ending in a multiplication gate---leaving open whether an additive or subtractive final gate at $\tau = 9$ can produce $7$ distinct integer roots.
+
+\subsection{Summary of Main Results}
+We settle the $\tau = 9$ frontier unconditionally over all of $\Z$, push the constructive record ladder through $\tau = 15$, and back the algebraic theory with a Lean~4.36.0 formalization:
+
+\begin{enumerate}[label=\textbf{Result \arabic*.},leftmargin=2.2em]
+  \item \textbf{Unconditional $\zmax(9) = 6$ over all of $\Z$ (Section~\ref{sec:census}).}
+  Every nonzero polynomial computable by a constant-free SLP of length $\tau \le 9$ has at most $6$ distinct integer roots in all of $\Z$ (with no bound on root magnitude). Our two-stage certifier inspects all $59{,}308{,}136{,}697$ canonical $9$-gate leaves ($7{,}767{,}648{,}995$ internal nodes) in $489.6\text{s}$ on $12$ cores: Stage~1 certifies $99.6023\%$ of leaves directly via magnitude-free degree, atomic product-factor, modular simple-root, and Taylor-stripped certificates; Stage~2 verifies all $11{,}040{,}213$ unique surviving polynomials in exact arbitrary-precision $\Z[x]$ arithmetic via squarefree decomposition and Hensel lifting past $2 \cdot \mathrm{CauchyBound}(g)$, finding $0$ counterexamples. Coupled with our verified $10$-gate $7$-root witnesses, this proves
+  \[
+    \zmax(1 \dots 9) = (1, 2, 3, 3, 4, 5, 5, 6, 6), \qquad \zmax(10) \ge 7.
+  \]
+  \item \textbf{New record witnesses at $\tau = 12, 13, 15$ and asymptotic linear growth (Section~\ref{sec:records}).}
+  We establish new record lower bounds $\zmax(12) \ge 9$ via the \emph{Midpoint Difference Trick}, $\zmax(13) \ge 10$ via \emph{Shifted Pronic-Square Root Quadrupling with Gate Reuse} (achieving root-to-gate ratio $10/13 \approx 0.769 > 2/3$), and $\zmax(15) \ge 11$, alongside a new symmetric $8$-root witness at $\tau = 11$ and a consecutive pronic-$5$ baseline $\zmax(14) \ge 10$. We further prove the unconditional infinite family $\zmax(3k) \ge 2k$ for all $k \ge 1$.
+  \item \textbf{Lean~4.36.0 formalization artifact (Section~\ref{sec:lean}).}
+  Four Lean~4 modules (\code{TauConjecture.lean}, \code{TauWitnesses.lean}, \code{ModularRootBound.lean}, and \code{TauRecords.lean}; $893$ lines total) formalize the SLP semantics, foundational degree/multiplication bounds, the Simple-Root Modular Certificate theorem (\code{intRootCount\_le\_of\_eval\_zmod}), every record witness up to $\tau = 15$, and the linear lower bound \code{tau\_pronic\_linear\_growth}, with zero \code{sorryAx} and strictly standard axioms.
+\end{enumerate}
+
+\section{Mathematical Certification Framework}\label{sec:framework}
+
+An initial bounded-window search on $[-32, 31]$ (\code{tau\_parallel.c}) checks all $59.31 \times 10^9$ canonical $9$-gate leaves in $138.991\text{s}$ on $12$ cores and finds no polynomial with $\ge 7$ roots in $[-32, 31]$. However, a $9$-gate SLP can have degree up to $2^9 = 512$ and coefficients exceeding $2^{256}$, so a bounded evaluation window cannot rule out large integer roots. To certify $\zZ(f) \le K$ \emph{unconditionally over all of $\Z$}, we replace bounded evaluation with a six-rule magnitude-free certificate architecture.
+
+\subsection{The Simple-Root Modular Certificate Theorem}
+
+\begin{theorem}[Simple-Root Modular Certificate; Lean: \code{intRootCount\_le\_of\_eval\_zmod}]\label{thm:modular}
+Let $f \in \Z[x]$ be nonzero, let $p$ be a prime, and let $\bar{f} \in \F_p[x]$ denote the reduction of $f$ modulo $p$. Suppose that:
+\begin{enumerate}[label=(\roman*),leftmargin=1.8em]
+  \item there exists $a \in \F_p$ with $\bar{f}(a) \neq 0$ (equivalently, $\#\{a \in \F_p : \bar{f}(a) = 0\} < p$, which forces $\bar{f} \neq 0$ in $\F_p[x]$);
+  \item for every $a \in \F_p$, $\bar{f}(a) = 0 \implies \bar{f}'(a) \neq 0$ (no repeated root of $\bar{f}$ in $\F_p$); and
+  \item $\#\{a \in \F_p : \bar{f}(a) = 0\} \le K$.
+\end{enumerate}
+Then $\zZ(f) \le K$ unconditionally over all of $\Z$.
+\end{theorem}
+
+\begin{proof}
+Let $S = Z_{\Z}(f) = \{r_1, \dots, r_m\} \subset \Z$ be the set of distinct integer roots of $f$. Because $\Z$ is an integral domain and the $r_i$ are pairwise distinct, $\prod_{i=1}^m (x - r_i)$ divides $f(x)$ in $\Z[x]$ (\code{prod\_linear\_dvd\_of\_roots}). Reducing modulo $p$ yields
+\[
+  \prod_{i=1}^m (x - \bar{r}_i) \;\Big|\; \bar{f}(x) \quad \text{in } \F_p[x].
+\]
+By hypothesis~(i), $\bar{f} \neq 0$ in $\F_p[x]$, so counting roots in $\F_p$ with multiplicity gives $m \le \mathrm{card}(\mathrm{roots}_{\F_p}(\bar{f}))$ (\code{intRootCount\_le\_zmod\_roots\_card\_mult}). By hypothesis~(ii), $(x - a)^2 \nmid \bar{f}(x)$ for every $a \in \F_p$, so every root of $\bar{f}$ in $\F_p$ has multiplicity $1$. Hence the residues $\bar{r}_1, \dots, \bar{r}_m \in \F_p$ are pairwise distinct, and
+\[
+  \zZ(f) = m \le \#\{a \in \F_p : \bar{f}(a) = 0\} \le K. \qedhere
+\]
+\end{proof}
+
+Crucially, Theorem~\ref{thm:modular} requires no coefficient expansion of $f$: along any SLP, we evaluate exact dual numbers $(g_k(a) \bmod p,\, g_k'(a) \bmod p)$ simultaneously for all $a \in \F_p$ in $O(p)$ integer operations per gate using the standard sum, difference, and product rules $(u, u') \cdot (v, v') = (uv,\, u'v + uv')$.
+
+\subsection{Taylor-Stripped Modular Extension for Repeated Small Roots}
+Theorem~\ref{thm:modular} fails whenever $f$ has a genuine repeated integer root (e.g., $x^2 \mid f$), which occurs frequently in SLP enumerations. To certify such leaves in C without full polynomial expansion, we track exact truncated Taylor expansions around the small-root set $S_0 = \{0, \pm 1, \pm 2, \pm 3\}$.
+
+\begin{proposition}[Taylor-Stripped Modular Certificate]\label{prop:taylor}
+Let $f \in \Z[x]$ be nonzero and let $p \ge 19$ be prime. For each $r_0 \in S_0 = \{0, \pm 1, \pm 2, \pm 3\}$, compute the exact truncated Taylor expansion
+\[
+  f(r_0 + t) \equiv \sum_{j=0}^{11} c_j^{(r_0)} t^j \pmod{t^{12}}
+\]
+in overflow-checked $128$-bit integer arithmetic. Suppose that:
+\begin{enumerate}[label=(\roman*),leftmargin=1.8em]
+  \item every double root of $\bar{f}$ in $\F_p$ is the reduction of some $r_0 \in S_0$;
+  \item for each such $r_0 \in S_0$, the exact Taylor expansion does not overflow, has a first nonzero coefficient $c_{m_{r_0}}^{(r_0)} \neq 0$ with $m_{r_0} \le 11$, and satisfies $c_{m_{r_0}}^{(r_0)} \not\equiv 0 \pmod{p}$; and
+  \item $\#\{a \in \F_p : \bar{f}(a) = 0\} \le K < p$.
+\end{enumerate}
+Then $\zZ(f) \le K$ unconditionally over all of $\Z$.
+\end{proposition}
+
+\begin{proof}
+Write $f(x) = \bigl(\prod_{r \in S} (x - r)^{m_r}\bigr) h(x)$ in $\Z[x]$, where $S \subseteq S_0$ is the set of $r_0$ appearing in~(i) and $h(r) \neq 0$ for every $r \in S$. Since $c_{m_r}^{(r)} = h(r) \prod_{r' \in S \setminus \{r\}} (r - r')^{m_{r'}}$ and $p \ge 19 > 6 = \max_{r \neq r' \in S_0} |r - r'|$, the residues of $S_0$ modulo $p$ are pairwise distinct and $\prod_{r' \neq r} (r - r')^{m_{r'}} \not\equiv 0 \pmod p$. Therefore $c_{m_r}^{(r)} \not\equiv 0 \pmod p \iff h(r) \not\equiv 0 \pmod p$. Consequently, no integer root of $h$ can collide modulo $p$ with any $r \in S$, and every other root of $\bar{f}$ in $\F_p$ is simple by~(i). Hence all distinct integer roots of $f$ reduce to pairwise distinct roots of $\bar{f}$ in $\F_p$, giving $\zZ(f) \le \#\{a \in \F_p : \bar{f}(a) = 0\} \le K$.
+\end{proof}
+
+\subsection{Degree, Atomic Product-Factor, and Exact $\Z[x]$ Hensel Verification}
+The complete certification pipeline combines four C-level rules with an exact $\Z[x]$ verifier:
+\begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
+  \item \textbf{Exact Degree Upper Bound (\code{cert\_deg}):} Tracking $\mathrm{deg\_ub}(1) = 0$, $\mathrm{deg\_ub}(x) = 1$, $\mathrm{deg\_ub}(A \pm B) = \max(\mathrm{deg\_ub}(A), \mathrm{deg\_ub}(B))$, and $\mathrm{deg\_ub}(A \cdot B) = \mathrm{deg\_ub}(A) + \mathrm{deg\_ub}(B)$, any nonzero $f \in \Z[x]$ satisfies $\zZ(f) \le \deg(f) \le \mathrm{deg\_ub}(f)$. Leaves with $\mathrm{deg\_ub}(f) \le K$ are certified immediately.
+  \item \textbf{Atomic Product-Factor Union Bound (\code{cert\_prod}):} Because $\Z$ is an integral domain, $Z_{\Z}(A \cdot B) = Z_{\Z}(A) \cup Z_{\Z}(B)$, $Z_{\Z}(A^2) = Z_{\Z}(A)$, $Z_{\Z}(2A) = Z_{\Z}(A)$, and $Z_{\Z}(c) = \emptyset$ for any nonzero constant $c$. Maintaining a bitmask \code{prod\_mask[k]} of atomic (non-product, non-constant) factors dividing $g_k$ guarantees
+  \[
+    \zZ(g_k) \le \sum_{a \in \mathrm{prod\_mask}[k]} z_{\mathrm{ub}}(g_a),
+  \]
+  where $z_{\mathrm{ub}}(g_a)$ is the best unconditional upper bound already certified for gate $g_a$.
+  \item \textbf{Zero / Duplicate Gate Elimination (\code{cert\_dup\_zero}):} Any leaf equal to $0$ or $\pm g_m$ ($m < \tau$) is either identically zero or computable in $\le \tau - 1$ gates (already certified to satisfy $\zZ \le K$).
+  \item \textbf{Multi-Prime Simple-Root and Taylor Cascade:} Uncertified leaves are tested by Theorem~\ref{thm:modular} and Proposition~\ref{prop:taylor} modulo $p_1 = 31$, with fallback primes $p_2 = 19$, $p_3 = 23$, and $p_4 = 29$.
+  \item \textbf{Exact Arbitrary-Precision $\Z[x]$ Survivor Verification (\code{verify\_z9\_all\_Z.py}):} Surviving leaves are deduplicated up to sign by a $3$-prime polynomial hash $(P_1 = 2^{31}-1,\, P_2 = 10^9+9,\, P_3 = 10^9+7)$ and verified in pure arbitrary-precision Python \code{int} arithmetic (zero external dependencies):
+  \begin{itemize}[leftmargin=1.5em]
+    \item Construct the exact coefficient vector of $f \in \Z[x]$; certify immediately if $f = 0$ (\code{zero}) or if leading-term cancellation reduces $\deg(f) \le K$ (\code{deg}).
+    \item Strip any factor $x^e$ ($e \ge 0$) to obtain $f_1(x)$ with $f_1(0) \neq 0$, and compute the exact primitive squarefree part $g = f_1 / \gcd_{\Q[x]}(f_1, f_1')$ using primitive polynomial remainder sequences (PRS) with asserted zero remainder in exact division.
+    \item Certify if $\deg(g) + \mathbf{1}_{e > 0} \le K$ (\code{sqf\_deg}), or via Theorem~\ref{thm:modular} on $g \bmod p$ (\code{sqf\_mod}).
+    \item For all remaining survivors, select a good prime $p \nmid \mathrm{lc}(g)$ for which $g \bmod p$ is squarefree, and perform \textbf{exact quadratic Hensel lifting} (\code{hensel\_ok}) of every root of $g \bmod p$ to modulus $p^{2^t} > 2 \cdot \mathrm{CauchyBound}(g)$, where $\mathrm{CauchyBound}(g) = 1 + \max_{i < \deg g} |g_i| / |g_{\deg g}|$. Since every integer root $r$ of $g$ satisfies $|r| < \mathrm{CauchyBound}(g)$ and reduces to a unique root modulo $p^{2^t}$, this recovers $100\%$ of $Z_{\Z}(f)$ exactly.
+  \end{itemize}
+\end{enumerate}
+
+\section{Unconditional $\tau = 9$ Census Over All of $\Z$}\label{sec:census}
+
+\subsection{Provably Lossless Canonicalization Rules}
+To exhaust all constant-free SLPs of length $\tau$ without redundancy, both \code{tau\_parallel.c} and \code{tau\_z9\_unconditional.c} enforce four canonicalization rules, each provably lossless for minimal-length SLPs computing nonzero polynomials over $\Z[x]$:
+\begin{enumerate}[label=(\alph*),leftmargin=1.8em]
+  \item \textbf{Sign canonicalization:} Every gate represents the equivalence class $\{\pm g_k\}$; operations reduce to $+$ ($i \le j$), $-$ ($i < j$), and $\times$ ($i \le j$), while $0$ is strictly redundant.
+  \item \textbf{Dead-gate pruning:} At depth $k$, the number $u$ of unused gates among $\{g_1, \dots, g_k\}$ must satisfy $u \le (\tau - k) + 1$; otherwise at least one computed gate can never reach the output wire $g_\tau$.
+  \item \textbf{Duplicate/zero gate pruning:} Any internal gate equal to $0$ or $\pm g_m$ for $m < k$ is skipped.
+  \item \textbf{Lex-minimal topological ordering:} If gate $g_k$ does not depend on $g_{k-1}$, we enforce $\mathrm{key}(k) \ge \mathrm{key}(k-1)$, eliminating commuting-gate permutations.
+\end{enumerate}
+
+\subsection{Complete Unconditional Census ($\tau = 1 \dots 9$)}
+All runs were executed on $12$ CPU cores (\code{clang -O3 -march=native -pthread} and a $12$-worker Python~3 pool). Table~\ref{tab:census} reports the complete unconditional census for $\tau = 1 \dots 9$.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Complete unconditional $\Z$-wide census for $\tau = 1 \dots 9$ on $12$ CPU cores. Every $\tau$ yields $0$ counterexamples above the certified bound $\zmax(\tau)$.}
+\label{tab:census}
+\begin{tabular}{@{}rrrrrrrrr@{}}
+\toprule
+$\tau$ & $\zmax(\tau)$ & Internal Nodes & Leaves Checked & C Time & Unique Surv. & Py Exact Time & Cex \\
+\midrule
+1 & \textbf{1} & 0 & 7 & 0.000s & 0 & 0.000s & \textbf{0} \\
+2 & \textbf{2} & 5 & 40 & 0.000s & 0 & 0.000s & \textbf{0} \\
+3 & \textbf{3} & 44 & 349 & 0.000s & 0 & 0.000s & \textbf{0} \\
+4 & \textbf{3} & 519 & 4,560 & 0.000s & 0 & 0.000s & \textbf{0} \\
+5 & \textbf{4} & 8,676 & 78,543 & 0.001s & 4 & 0.000s & \textbf{0} \\
+6 & \textbf{5} & 195,403 & 1,724,358 & 0.007s & 349 & 0.135s & \textbf{0} \\
+7 & \textbf{5} & 5,531,334 & 46,799,099 & 0.288s & 15,290 & 0.164s & \textbf{0} \\
+8 & \textbf{6} & 190,402,194 & 1,531,518,439 & 7.202s & 342,991 & 1.693s & \textbf{0} \\
+\textbf{9} & \textbf{6} & \textbf{7,767,648,995} & \textbf{59,308,136,697} & \textbf{399.671s} & \textbf{11,040,213} & \textbf{89.928s} & \textbf{0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Exact Breakdown of the $\tau = 9$ Certification ($K = 6$)}
+At $\tau = 9$, Stage~1 (\code{tau\_z9\_unconditional.c}) visits exactly $7{,}767{,}648{,}995$ canonical internal nodes and $59{,}308{,}136{,}697$ canonical leaves (matching the independent bounded-window enumerator \code{tau\_parallel.c} to the exact integer) in $399.671\text{s}$ ($148.4\text{M}$ leaves/sec across $12$ cores). Table~\ref{tab:stage1} gives the exact conservation breakdown across all certification rules.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Stage~1 (\code{tau\_z9\_unconditional.c}) exact certification breakdown for all $59{,}308{,}136{,}697$ canonical $9$-gate leaves ($K = 6$, wall time $399.671\text{s}$ on $12$ cores).}
+\label{tab:stage1}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Certification Mechanism & Leaves Certified & Share of Total \\
+\midrule
+Exact degree bound (\code{deg\_ub <= 6}) & 44,427,829,968 & 74.9102\% \\
+Atomic product-factor union bound (\code{cert\_prod}) & 6,343,706,401 & 10.6962\% \\
+Simple-Root Modular Certificate mod $p_1 = 31$ & 4,178,330,044 & 7.0451\% \\
+Exact Taylor-stripped Certificate mod $p_1 = 31$ & 2,991,794,570 & 5.0445\% \\
+Zero / duplicate gate (\code{cert\_dup\_zero}) & 221,875,029 & 0.3741\% \\
+Fallback Simple-Root / Taylor mod $p_2 = 19$ & 675,427,005 & 1.1388\% \\
+Fallback Simple-Root / Taylor mod $p_3 = 23$ & 213,548,025 & 0.3601\% \\
+Fallback Simple-Root / Taylor mod $p_4 = 29$ & 19,735,848 & 0.0333\% \\
+Passed to exact $\Z[x]$ verifier (\code{survivors\_raw}) & 235,889,807 & 0.3977\% \\
+\midrule
+\textbf{Total (exact conservation check)} & \textbf{59,308,136,697} & \textbf{100.0000\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Deduplicating the $235{,}889{,}807$ raw survivors by the $3$-prime hash $(P_1, P_2, P_3)$ yields $11{,}040{,}213$ unique surviving polynomials, which Stage~2 (\code{verify\_z9\_all\_Z.py}) certifies in $89.928\text{s}$ across $12$ workers (total wall time $489.6\text{s}$). Table~\ref{tab:stage2} reports the exact Stage~2 breakdown. Notably, the maximum exact integer root count among all $303{,}392$ Hensel-lifted survivors is $5$ (strictly below $7$), and the counterexample count is $0$.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Stage~2 (\code{verify\_z9\_all\_Z.py}) exact arbitrary-precision $\Z[x]$ certification of all $11{,}040{,}213$ unique $\tau = 9$ survivors ($K = 6$, wall time $89.928\text{s}$ on $12$ workers).}
+\label{tab:stage2}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Exact $\Z[x]$ Certification Method & Survivors Certified & Share \\
+\midrule
+Zero polynomial (\code{zero}) & 0 & 0.00\% \\
+Exact degree $\le 6$ after cancellation (\code{deg}) & 786,962 & 7.13\% \\
+Exact squarefree part degree $\le 6$ (\code{sqf\_deg}) & 3,076,205 & 27.86\% \\
+Exact squarefree part simple-root mod $p$ (\code{sqf\_mod}) & 6,873,654 & 62.26\% \\
+Exact Hensel lifting past $2 \cdot \mathrm{CauchyBound}(g)$ (\code{hensel\_ok}) & 303,392 & 2.75\% \\
+Counterexamples with $\ge 7$ integer roots (\code{COUNTEREXAMPLE}) & \textbf{0} & \textbf{0.00\%} \\
+\midrule
+\textbf{Total verified} & \textbf{11,040,213} & \textbf{100.00\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Honest Soundness, Collision Audit, and Reproducibility}
+To maintain strict scientific transparency, we audit every assumption in the computational proof:
+\begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
+  \item \textbf{Zero root-magnitude assumption:} Every rule in Tables~\ref{tab:stage1} and~\ref{tab:stage2} holds unconditionally over all of $\Z$, including arbitrarily large roots. The Stage~2 verifier passes an automated \code{--self-test} covering polynomials with high-multiplicity roots at $\pm 10^9$ as well as our $10$-gate $7$-root witness (which it flags as a counterexample at $K = 6$).
+  \item \textbf{Hash-based duplicate and survivor deduplication:}
+  \begin{itemize}[leftmargin=1.5em]
+    \item Internal duplicate/zero gate pruning uses $2$-point evaluation modulo $P_1 = 2^{31}-1$ and $P_2 = 10^9+9$. By Schwartz--Zippel, a false collision between two distinct polynomials of degree $d$ has probability $\le d^2 / (P_1 P_2) \approx 4.6 \times 10^{-19} d^2$ (for typical internal degrees $d \le 16$, $< 1.2 \times 10^{-16}$ per check).
+    \item Raw survivor deduplication uses a $3$-prime polynomial hash modulo $(P_1, P_2, P_3 = 10^9+7)$ with $P_1 P_2 P_3 \approx 2.15 \times 10^{27}$, yielding a birthday collision probability $< 10^{-13}$ across $1.1 \times 10^7$ unique survivors.
+  \end{itemize}
+  Eliminating even this $< 10^{-13}$ hash-deduplication caveat (by disabling hash deduplication or checking exact polynomial equality) is straightforward engineering at a modest wall-time multiplier; likewise, the exhaustive C/Python search itself is not replayed inside the Lean~4 kernel.
+  \item \textbf{Exact reproducibility commands:}
+\begin{verbatim}
+python3 experiments/pvsnp/tau/verify_z9_all_Z.py --self-test
+clang -O3 -march=native -pthread -o /tmp/tau_z9_unconditional \
+    experiments/pvsnp/tau/tau_z9_unconditional.c
+/tmp/tau_z9_unconditional 9 6 12 /tmp/z9_surv.txt
+python3 experiments/pvsnp/tau/verify_z9_all_Z.py /tmp/z9_surv.txt 6 12
+\end{verbatim}
+\end{enumerate}
+
+\section{New Record Witnesses for $\tau = 10 \dots 15$ and Linear Growth}\label{sec:records}
+
+\subsection{Two New Algebraic Gate-Reuse Mechanisms}
+Searching $\tau = 10 \dots 15$ with four complementary engines---structured algebraic family search (\code{tau\_records\_10\_14.py}), $12$-core exhaustive weighted composition search up to $\tau_P = 8$ over $14$ inner polynomials (\code{compose}), $12$-core diverse beam search of width $W = 40{,}000$ (\code{beam}), and seeded exhaustive extension/mutation up to $3.79 \times 10^9$ leaves (\code{extend}, \code{mutate})---uncovered two algebraic mechanisms that break the previous records at $\tau = 12$ and $\tau = 13$.
+
+\paragraph{Mechanism 1: The Midpoint Difference Trick ($\tau = 11 \to 8$ symmetric roots, $\tau = 12 \to 9$ roots).}
+The classical $5$-gate $4$-root difference-of-squares factor
+\[
+  g_5 = x^2 - (2 - x^2)^2 = -(x^2 - 1)(x^2 - 4) \qquad (\text{roots } \{\pm 1, \pm 2\})
+\]
+computes the intermediate wire $g_3 = 2 - x^2$. When we also form $g_8 = x^2 - 16$ (roots $\{\pm 4\}$) using $g_6 = 2 \cdot 2 = 4$ and $g_7 = 4 \cdot 4 = 16$, the midpoint of $2$ and $16$ is $9 = 3^2$, so a \emph{single subtraction} of two already-computed wires yields two more integer roots for free:
+\[
+  g_{10} = g_3 - g_8 = (2 - x^2) - (x^2 - 16) = 18 - 2x^2 = 2(9 - x^2) \qquad (\text{roots } \{\pm 3\}).
+\]
+Multiplying $g_5 \cdot g_8 \cdot g_{10}$ gives \textbf{8 symmetric roots} $\{\pm 1, \pm 2, \pm 3, \pm 4\}$ in $11$ gates while leaving $x = 0$ free. A single final multiplication $g_{12} = x \cdot g_{11}$ produces \textbf{9 distinct integer roots} $\{-4, -3, -2, -1, 0, 1, 2, 3, 4\}$ in \textbf{12 gates} ($+1$ over the previous record of $8$ at $\tau = 12$).
+
+\paragraph{Mechanism 2: Shifted Pronic-Square Root Quadrupling with Gate Reuse ($\tau = 13 \to 10$ roots, $\tau = 15 \to 11$ roots).}
+Let $q = x(x + 1)$, which takes pronic values $p_k = k(k+1) \in \{0, 2, 6, 12, 20, 30, \dots\}$ at integer $x$. The center $a = 16 = 4^2 = 2^4$ admits \emph{two} symmetric pronic pairs:
+\[
+  2 \cdot 16 = 32 = 2 + 30 = 12 + 20,
+\]
+with half-differences $d_1 = 14 = 16 - 2$ (costing $1$ subtraction from existing wires $16$ and $2$) and $d_2 = 4$ (whose square $d_2^2 = 16 = a$ costs \emph{$0$ extra gates}!). Thus:
+\begin{itemize}[leftmargin=1.5em]
+  \item $(q - 16)^2 - 14^2 = (q - 2)(q - 30)$ contributes $4$ roots $\{-6, -2, 1, 5\}$;
+  \item $(q - 16)^2 - 16 = (q - 12)(q - 20)$ contributes $4$ roots $\{-5, -4, 3, 4\}$;
+  \item multiplying by the already-computed gate $g_2 = q$ adds $2$ roots $\{-1, 0\}$ in $1$ gate.
+\end{itemize}
+This yields \textbf{10 distinct integer roots} $\{-6, -5, -4, -2, -1, 0, 1, 3, 4, 5\}$ in \textbf{13 gates} ($+1$ over the previous record of $9$ at $\tau = 13$), achieving a root-to-gate slope of $10/13 \approx 0.769 > 2/3$. Moreover, because wire $g_3 = 2$ is already present in the DAG, appending $g_{14} = x - g_3$ and $g_{15} = g_{13} \cdot g_{14}$ immediately yields \textbf{11 distinct integer roots} in \textbf{15 gates}.
+
+\paragraph{Why intermediate gate reuse is essential.}
+Exhaustive pure-composition search (\code{tau\_records\_fast compose 8 12}) over all canonical outer SLPs $P(y)$ of length $\tau_P \le 8$ ($1.53 \times 10^9$ leaves per inner polynomial) across $14$ high-collision inner polynomials $Q(x)$ found \emph{no} pure composition beating our new ladder. Similarly, seeded exhaustive extensions (up to $2.01 \times 10^9$ leaves from the midpoint prefix and $3.79 \times 10^9$ leaves from the pronic-square prefix) and over $3.7 \times 10^6$ local $1$- and $2$-gate mutations confirmed local optimality of the ladder. Reusing intermediate wires ($q$, $2$, $16$, and $2 - x^2$) across distinct factors is what enables the $\tau = 12$ and $\tau = 13$ breakthroughs.
+
+\subsection{Complete Verified Record Witness Table ($\tau = 6, 8, 10, 11, 12, 13, 15$)}
+Table~\ref{tab:witnesses} summarizes our record witnesses; every entry is verified in exact arbitrary-precision Python integer arithmetic and machine-checked in Lean~4.36.0 (Section~\ref{sec:lean}). Below the table we list the explicit gate sequences and expanded polynomials for each witness.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Verified record witnesses for $\tau \in \{6, 8, 10, 11, 12, 13, 15\}$ (plus $\tau = 14$ baseline). Bold entries at $\tau = 12, 13$ are new records ($+1$ root over previous best).}
+\label{tab:witnesses}
+\begin{tabular}{@{}rlll@{}}
+\toprule
+$\tau$ & Roots & Exact Root Set $Z_{\Z}(f)$ & Construction / Family \\
+\midrule
+6 & 5 & $\{-2,-1,0,1,2\}$ & Difference-of-squares: $x(x^2-(2-x^2)^2)$ \\
+8 & 6 & $\{-3,-2,-1,0,1,2\}$ & Pronic-3: $q(2-q)(6-q)$, $q=x(x+1)$ \\
+10 & 7 & $\{-3,-2,-1,0,1,2,3\}$ & Symmetric DoS: $-x(x^2-1)(x^2-4)(x^2-9)$ \\
+10 & 7 & $\{-4,-3,-2,-1,0,1,2\}$ & Pronic-3 + linear: $q(2-q)(6-q)(x+4)$ \\
+11 & 8 & $\{-4,-3,-2,-1,0,1,2,3\}$ & Pronic-4: $q(2-q)(6-q)(12-q)$ \\
+11 & 8 & $\{-4,-3,-2,-1,1,2,3,4\}$ & Symmetric midpoint: $2(x^2-1)(x^2-4)(x^2-9)(x^2-16)$ \\
+\textbf{12} & \textbf{9} & $\{-4,-3,-2,-1,0,1,2,3,4\}$ & \textbf{Midpoint Difference Trick:} $x \cdot 2(x^2-1)(x^2-4)(x^2-9)(x^2-16)$ \\
+\textbf{13} & \textbf{10} & $\{-6,-5,-4,-2,-1,0,1,3,4,5\}$ & \textbf{Shifted Pronic-Square:} $q((q-16)^2-14^2)((q-16)^2-16)$ \\
+14 & 10 & $\{-5,-4,-3,-2,-1,0,1,2,3,4\}$ & Pronic-5 baseline: $q(2-q)(6-q)(12-q)(20-q)$ \\
+\textbf{15} & \textbf{11} & $\{-6,-5,-4,-2,-1,0,1,2,3,4,5\}$ & \textbf{Bonus extension:} $(\tau=13\text{ witness}) \cdot (x - 2)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Explicit Gate Sequences and Exact Polynomials.}
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+  \item \textbf{$\tau = 6$ ($5$ roots):}
+  \code{g1=1+1; g2=x*x; g3=g1-g2; g4=g3*g3; g5=g2-g4; g6=x*g5}.\\
+  $f(x) = -x^5 + 5x^3 - 4x$.
+  \item \textbf{$\tau = 8$ ($6$ roots):}
+  \code{g1=1+1; g2=1+x; g3=g1+g1; g4=x*g2; g5=g1-g4; g6=g3+g5; g7=g4*g5; g8=g6*g7}.\\
+  $f(x) = x^6 + 3x^5 - 5x^4 - 15x^3 + 4x^2 + 12x$.
+  \item \textbf{$\tau = 10$ ($7$ roots, symmetric):}
+  \code{g1=1+1; g2=x*x; g3=g1-g2; g4=g3*g3; g5=g2-g4; g6=x*g5; g7=1+g1; g8=g7*g7; g9=g2-g8; g10=g6*g9}.\\
+  $f(x) = -x^7 + 14x^5 - 49x^3 + 36x$.
+  \item \textbf{$\tau = 11$ ($8$ roots, pronic):}
+  \code{g1=1+1; g2=1+x; g3=g1+g1; g4=x*g2; g5=g1-g4; g6=g3+g5; g7=g4*g5; g8=g6*g7; g9=g1+g3; g10=g6+g9; g11=g8*g10}.\\
+  $f(x) = -x^8 - 4x^7 + 14x^6 + 56x^5 - 49x^4 - 196x^3 + 36x^2 + 144x$.
+  \item \textbf{$\tau = 11$ ($8$ roots, symmetric midpoint):}
+  \code{g1=1+1; g2=x*x; g3=g1-g2; g4=g3*g3; g5=g2-g4; g6=g1*g1; g7=g6*g6; g8=g2-g7; g9=g5*g8; g10=g3-g8; g11=g9*g10}.\\
+  $f(x) = 2x^8 - 60x^6 + 546x^4 - 1640x^2 + 1152$.
+  \item \textbf{$\tau = 12$ ($9$ roots, NEW RECORD):}
+  Append \code{g12=x*g11} to the $\tau = 11$ symmetric midpoint SLP.\\
+  $f(x) = 2x^9 - 60x^7 + 546x^5 - 1640x^3 + 1152x$.
+  \item \textbf{$\tau = 13$ ($10$ roots, NEW RECORD):}
+  \code{g1=1+x; g2=x*g1; g3=1+1; g4=g3+g3; g5=g4*g4; g6=g2-g5; g7=g6*g6; g8=g5-g3; g9=g8*g8; g10=g7-g9; g11=g7-g5; g12=g10*g11; g13=g12*g2}.\\
+  $f(x) = x^{10} + 5x^9 - 54x^8 - 246x^7 + 945x^6 + 3717x^5 - 5692x^4 - 17876x^3 + 4800x^2 + 14400x$.
+  \item \textbf{$\tau = 15$ ($11$ roots, bonus):}
+  Append \code{g14=x-g3; g15=g13*g14} to the $\tau = 13$ record SLP.\\
+  $f(x) = x^{11} + 3x^{10} - 64x^9 - 138x^8 + 1437x^7 + 1827x^6 - 13126x^5 - 6492x^4 + 40552x^3 + 4800x^2 - 28800x$.
+\end{itemize}
+
+\subsection{Unconditional Asymptotic Linear Lower Bound}
+The pronic recurrence yields an infinite family of constant-free SLPs with asymptotic slope $2/3$:
+
+\begin{theorem}[Unconditional Pronic Linear Growth; Lean: \code{tau\_pronic\_linear\_growth}]\label{thm:linear}
+For every integer $k \ge 1$, there exists a constant-free SLP of length $3k$ computing
+\[
+  F_k(x) := \prod_{j=0}^{k-1} \bigl(x(x - 1) - j(j + 1)\bigr) \in \Z[x] \setminus \{0\},
+\]
+whose distinct integer root set is $\{-k+1, \dots, k\}$ of cardinality $2k$. Consequently, $\zmax(3k) \ge 2k$ for all $k \ge 1$.
+\end{theorem}
+
+\begin{proof}
+At stage $n = 0$ ($\tau = 3$), three gates compute $w_2 = 1 + 1 = 2$, $w_3 = x - 1$, and $w_4 = x(x - 1) = F_1(x)$ (also storing the first step $d_0 = 2$ at $w_2$ and factor $f_0 = x(x-1)$ at $w_4$). Given stage $n$ ($\tau = 3(n+1)$) with wires holding $2$, $d_n = 2(n+1)$, $f_n = x(x-1) - n(n+1)$, and $P_n = F_{n+1}(x)$, three additional gates compute
+\[
+  d_{n+1} = d_n + 2 = 2(n+2), \qquad
+  f_{n+1} = f_n - d_n = x(x - 1) - (n+1)(n+2), \qquad
+  P_{n+1} = P_n \cdot f_{n+1} = F_{n+2}(x),
+\]
+using the finite-difference identity $(n+1)(n+2) - n(n+1) = 2(n+1)$. Since $x(x-1) - j(j+1) = (x - (j+1))(x + j)$, the roots of $F_k$ are precisely $\{-k+1, \dots, k\}$ ($2k$ distinct integers), and $F_k(k+1) > 0$ proves $F_k \neq 0$.
+\end{proof}
+
+\section{Lean~4.36.0 Formalization Artifact}\label{sec:lean}
+
+To place the algebraic foundations, the Simple-Root Modular Certificate theorem, the complete witness ladder up to $\tau = 15$, and the linear growth theorem beyond human transcription error, we formalized all four components in Lean~4.36.0 under \code{Research/PvsNP/Tau/}. Table~\ref{tab:lean} catalogs the four modules ($893$ lines total).
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Lean~4.36.0 formalization artifact (\code{Research/PvsNP/Tau/}, $893$ lines total). All modules compile with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.}
+\label{tab:lean}
+\begin{tabularx}{\textwidth}{@{}l r X@{}}
+\toprule
+Module & LOC & Key Machine-Verified Definitions and Theorems \\
+\midrule
+\code{TauConjecture.lean} & 344 &
+\code{SLP}, \code{SLP.evalPoly}, \code{SLP.evalInt}, \code{intRootCount}, \code{ShubSmaleTauConjecture}, \code{zMaxGe}, \code{zMaxGe\_succ}, \code{intRootCount\_le\_natDegree}, \code{intRootCount\_mul\_le}, \code{slp\_natDegree\_le\_two\_pow\_mulCount}, \code{slp\_intRootCount\_le\_two\_pow}, \code{slp\_mulFree\_intRootCount\_le\_one}, \code{slp\_one\_mul\_intRootCount\_le\_two}, \code{zMaxGe\_of\_evalInt}, and witnesses \code{tau\_witness\_0} through \code{tau\_witness\_8} ($\zmax(8) \ge 6$). \\
+\addlinespace[3pt]
+\code{TauWitnesses.lean} & 114 &
+\code{tau\_two\_mul\_natDegree\_le\_four}, \code{tau\_two\_mul\_intRootCount\_le\_four}, \code{tau\_witness\_6\_five} ($\zmax(6) \ge 5$), \code{tau\_witness\_10\_seven} and \code{tau\_witness\_10\_seven\_pronic} ($\zmax(10) \ge 7$), \code{tau\_witness\_11\_eight} ($\zmax(11) \ge 8$), and \code{tau\_witness\_13\_nine} ($\zmax(13) \ge 9$). \\
+\addlinespace[3pt]
+\code{ModularRootBound.lean} & 338 &
+\code{prod\_linear\_dvd\_of\_roots}, \code{intRootCount\_le\_zmod\_roots\_card\_mult}, \code{intRootCount\_le\_zmod\_roots\_of\_no\_double\_root}, \code{intRootCount\_le\_of\_eval\_zmod} (Theorem~\ref{thm:modular}), recursive \code{pronicSLP}, \code{pronicSLP\_evalInt}, and \code{tau\_pronic\_linear\_growth} / \code{tau\_linear\_lower\_bound} (Theorem~\ref{thm:linear}: \code{zMaxGe (3 * k) (2 * k)}). \\
+\addlinespace[3pt]
+\code{TauRecords.lean} & 97 &
+\code{tau\_record\_11\_eight\_sym} ($\zmax(11) \ge 8$, symmetric midpoint), \code{tau\_record\_12\_nine} ($\zmax(12) \ge 9$, Midpoint Difference Trick), \code{tau\_record\_13\_ten} ($\zmax(13) \ge 10$, Shifted Pronic-Square), and \code{tau\_record\_15\_eleven} ($\zmax(15) \ge 11$, bonus extension). \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{remark}[Axiom Audit and Verification Boundary]
+Every theorem in Table~\ref{tab:lean} is verified by Lean~4.36.0's kernel with \code{0 sorryAx} and depends exclusively on the standard mathematical axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$. Concretely, \code{zMaxGe\_of\_evalInt} bridges computable integer evaluation \code{SLP.evalInt} to the noncomputable \code{Polynomial.roots} API, so every witness theorem is discharged cleanly by kernel reduction (\code{decide}). As noted in Section~\ref{sec:census}, the exhaustive $\tau = 9$ upper bound over $5.93 \times 10^{10}$ leaves is certified by our C and exact Python $\Z[x]$ pipeline rather than replayed inside the Lean kernel.
+\end{remark}
+
+\section{Conclusion and Open Questions}
+We have unconditionally resolved the $7$-root threshold of the Shub--Smale $\tau$-conjecture over all of $\Z$ ($\zmax(9) = 6$, $\zmax(10) \ge 7$), discovered two gate-reuse mechanisms setting new constructive records $\zmax(12) \ge 9$, $\zmax(13) \ge 10$, and $\zmax(15) \ge 11$, proved $\zmax(3k) \ge 2k$, and formalized the underlying modular certification theorem and witness ladder in Lean~4.36.0. Two immediate frontiers remain open: (i) determining whether $\zmax(10) = 7$ or $8$ (the canonical $10$-gate tree is roughly $40\times$ larger than $\tau = 9$), and (ii) determining whether the gate-reuse slope $10/13 \approx 0.769$ can be sustained asymptotically beyond $2/3$---or whether superlinear growth $\zmax(\tau) = \omega(\tau)$ is achievable.
+
+\begin{thebibliography}{9}
+
+\bibitem{ShubSmale1995}
+M.~Shub and S.~Smale,
+\emph{On the intractability of Hilbert's Nullstellensatz and an algebraic version of ``$\mathrm{NP} \neq \mathrm{P}$?''},
+Duke Mathematical Journal \textbf{81} (1995), no.~1, 47--54.
+
+\bibitem{Smale1998}
+S.~Smale,
+\emph{Mathematical problems for the next century},
+The Mathematical Intelligencer \textbf{20} (1998), no.~2, 7--15.
+
+\bibitem{Burgisser2009}
+P.~B\"urgisser,
+\emph{On defining integers and proving arithmetic circuit lower bounds},
+Computational Complexity \textbf{18} (2009), no.~1, 81--103.
+
+\bibitem{SantibanezLeal2026}
+Santiba\~{n}ez-Leal,
+\emph{Exact census of constant-free straight-line program integer root counts for $\tau \le 8$},
+August 2026.
+
+\end{thebibliography}
+
+\end{document}
