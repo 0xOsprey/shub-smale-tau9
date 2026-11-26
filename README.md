@@ -44,7 +44,7 @@ z_{\max}(1 \dots 9) = (1, 2, 3, 3, 4, 5, 5, 6, 6), \qquad z_{\max}(10) \ge 7.
 | **18** | $`\ge 14`$ *(new record)* | **Pronic Self-Shift Identity** ($`a + a^2 = a(a+1)`$) | `tau_record_18_fourteen` |
 
 3. **Exact Bounded-Multiplication Sharpness ($`m \in \{0, 1, 2, 3, 4\}`$):**
-   - Proved in Lean 4 (`bounded_mult_exact_sharpness_four`) that the trivial degree ceiling $`\max_{\mathrm{mulCount}(P) \le m} z_{\mathbb{Z}}(P) = 2^m`$ is **exact and sharp** for all $`m \in \{0, 1, 2, 3, 4\}`$ (`1, 2, 4, 8, 16`), including an explicit **4-multiplication** 4-level iterated fold achieving **16 distinct integer roots** (`tau_four_mul_sharp`, arising from the primitive Gaussian-integer norm $`67{,}405 = 5 \cdot 13 \cdot 17 \cdot 61`$)!
+   - Proved in Lean 4 (`bounded_mult_exact_sharpness_four`) that the trivial degree ceiling $`\max_{\mathrm{mulCount}(P) \le m} z_{\mathbb{Z}}(P) = 2^m`$ is **exact and sharp** for all $`m \in \{0, 1, 2, 3, 4\}`$ (`1, 2, 4, 8, 16`), including an explicit **4-multiplication** 4-level iterated fold achieving **16 distinct integer roots** (`tau_four_mul_sharp`, arising from the primitive Gaussian-integer norm $`67{,}405 = 5 \cdot 13 \cdot 17 \cdot 61`$). *Caveat:* this bounds multiplication gates only (all `×` gates counted; constants are built from `1` by addition chains with zero multiplications, so `τ` is large). It is classical-in-spirit iterated folding and does not improve any finite-`τ` record.
 
 4. **Machine-Verified Lean 4.36.0 Formalization (`0 sorryAx`, strictly `{propext, Classical.choice, Quot.sound}`):**
    - `Research/PvsNP/Tau/TauConjecture.lean` — Constant-free `SLP`, `ShubSmaleTauConjecture`, degree & multiplication root bounds, computable `zMaxGe_of_evalInt` witness certifier.

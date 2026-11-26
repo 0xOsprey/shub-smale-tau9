@@ -26,7 +26,7 @@
 \newcommand{\zmax}{z_{\max}}
 \newcommand{\zZ}{z_{\Z}}
 
-\title{Resolving the 7-Root Threshold of the Shub--Smale $\tau$-Conjecture: Unconditional $\zmax(9) = 6$, New Record Witnesses up to $\tau = 15$, and Lean~4 Certification}
+\title{Resolving the 7-Root Threshold of the Shub--Smale $\tau$-Conjecture: Unconditional $\zmax(9) = 6$, New Record Witnesses up to $\tau = 18$, and Lean~4 Certification}
 
 \author{Research Paper --- Computational Algebra, Exhaustive Certification, and Lean~4 Formalization}
 
@@ -45,7 +45,8 @@ We close the full unrestricted $\tau = 9$ space unconditionally over all of $\Z$
     \zmax(1 \dots 9) = (1, 2, 3, 3, 4, 5, 5, 6, 6), \qquad \zmax(10) \ge 7.
   \]
   \item \textbf{New record finite-$\tau$ witnesses at $\tau = 11, 12, 13, 15$:} We introduce two new algebraic gate-reuse constructions: the \emph{Midpoint Difference Trick}, yielding a symmetric $8$-root witness at $\tau = 11$ and $9$ distinct integer roots at $\tau = 12$, and \emph{Shifted Pronic-Square Root Quadrupling with Gate Reuse}, yielding $10$ distinct integer roots at $\tau = 13$ (achieving slope $10/13 \approx 0.769 > 2/3$) and $11$ distinct integer roots at $\tau = 15$. We also give a Lean-verified formalization of the classical linear-rate pronic-folding baseline $\zmax(3k) \ge 2k$ for all $k \ge 1$.
-  \item \textbf{Machine-verified Lean~4.36.0 artifact:} We formalize the SLP model, the Simple-Root Modular Certificate theorem (\code{intRootCount\_le\_of\_eval\_zmod}), all record witnesses up to $\tau = 15$, and the pronic linear growth theorem across four Lean~4 modules ($893$ lines total), compiling with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.
+  \item \textbf{Further records and exact bounded-multiplication sharpness:} Extending the same gate-reuse ideas gives $\zmax(16) \ge 12$, $\zmax(17) \ge 13$ (\emph{Square-Extraction Trick}) and $\zmax(18) \ge 14$ (\emph{Pronic Self-Shift Identity}). Separately, we show that the trivial degree ceiling is exactly attained: among constant-free SLPs with at most $m$ multiplication gates, the maximum number of distinct integer roots is exactly $2^m$ for $m \in \{0,1,2,3,4\}$, with an explicit $4$-multiplication witness having $16$ distinct integer roots (found by a Diophantine preimage search).
+  \item \textbf{Machine-verified Lean~4.36.0 artifact:} We formalize the SLP model, the Simple-Root Modular Certificate theorem (\code{intRootCount\_le\_of\_eval\_zmod}), all record witnesses up to $\tau = 18$, the $m \le 4$ bounded-multiplication sharpness theorem, and the pronic linear growth theorem across six Lean~4 modules ($1{,}401$ lines total; the full repository audit covers $706$ public theorems in $42$ modules), compiling with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.
 \end{enumerate}
 We include a transparent soundness and hash-collision audit delineating exact proof boundaries and full reproducibility commands.
 \end{abstract}
@@ -77,7 +78,7 @@ We settle the $\tau = 9$ frontier unconditionally over all of $\Z$, push the con
   \item \textbf{New record witnesses at $\tau = 12, 13, 15$ and asymptotic linear growth (Section~\ref{sec:records}).}
   We establish new record lower bounds $\zmax(12) \ge 9$ via the \emph{Midpoint Difference Trick}, $\zmax(13) \ge 10$ via \emph{Shifted Pronic-Square Root Quadrupling with Gate Reuse} (achieving root-to-gate ratio $10/13 \approx 0.769 > 2/3$), and $\zmax(15) \ge 11$, alongside a new symmetric $8$-root witness at $\tau = 11$ and a consecutive pronic-$5$ baseline $\zmax(14) \ge 10$. We further prove the unconditional infinite family $\zmax(3k) \ge 2k$ for all $k \ge 1$.
   \item \textbf{Lean~4.36.0 formalization artifact (Section~\ref{sec:lean}).}
-  Four Lean~4 modules (\code{TauConjecture.lean}, \code{TauWitnesses.lean}, \code{ModularRootBound.lean}, and \code{TauRecords.lean}; $893$ lines total) formalize the SLP semantics, foundational degree/multiplication bounds, the Simple-Root Modular Certificate theorem (\code{intRootCount\_le\_of\_eval\_zmod}), every record witness up to $\tau = 15$, and the linear lower bound \code{tau\_pronic\_linear\_growth}, with zero \code{sorryAx} and strictly standard axioms.
+  Six Lean~4 modules (\code{TauConjecture.lean}, \code{TauWitnesses.lean}, \code{ModularRootBound.lean}, \code{TauRecords.lean}, \code{BoundedMult.lean}, and \code{FoldingRecords.lean}; $1{,}401$ lines total) formalize the SLP semantics, foundational degree/multiplication bounds, the Simple-Root Modular Certificate theorem (\code{intRootCount\_le\_of\_eval\_zmod}), every record witness up to $\tau = 18$, exact bounded-multiplication sharpness for $m \le 4$, and the linear lower bound \code{tau\_pronic\_linear\_growth}, with zero \code{sorryAx} and strictly standard axioms.
 \end{enumerate}
 
 \section{Mathematical Certification Framework}\label{sec:framework}
@@ -288,13 +289,13 @@ This yields \textbf{10 distinct integer roots} $\{-6, -5, -4, -2, -1, 0, 1, 3, 4
 \paragraph{Why intermediate gate reuse is essential.}
 Exhaustive pure-composition search (\code{tau\_records\_fast compose 8 12}) over all canonical outer SLPs $P(y)$ of length $\tau_P \le 8$ ($1.53 \times 10^9$ leaves per inner polynomial) across $14$ high-collision inner polynomials $Q(x)$ found \emph{no} pure composition beating our new ladder. Similarly, seeded exhaustive extensions (up to $2.01 \times 10^9$ leaves from the midpoint prefix and $3.79 \times 10^9$ leaves from the pronic-square prefix) and over $3.7 \times 10^6$ local $1$- and $2$-gate mutations confirmed local optimality of the ladder. Reusing intermediate wires ($q$, $2$, $16$, and $2 - x^2$) across distinct factors is what enables the $\tau = 12$ and $\tau = 13$ breakthroughs.
 
-\subsection{Complete Verified Record Witness Table ($\tau = 6, 8, 10, 11, 12, 13, 15$)}
+\subsection{Complete Verified Record Witness Table ($\tau = 6, 8, 10, 11, 12, 13, 15, 16, 17, 18$)}
 Table~\ref{tab:witnesses} summarizes our record witnesses; every entry is verified in exact arbitrary-precision Python integer arithmetic and machine-checked in Lean~4.36.0 (Section~\ref{sec:lean}). Below the table we list the explicit gate sequences and expanded polynomials for each witness.
 
 \begin{table}[ht]
 \centering
 \small
-\caption{Verified record witnesses for $\tau \in \{6, 8, 10, 11, 12, 13, 15\}$ (plus $\tau = 14$ baseline). Bold entries at $\tau = 12, 13$ are new records ($+1$ root over previous best).}
+\caption{Verified record witnesses for $\tau \in \{6, 8, 10, 11, 12, 13, 15, 16, 17, 18\}$ (plus $\tau = 14$ baseline). Bold entries at $\tau \ge 12$ are new records ($+1$ root over previous best).}
 \label{tab:witnesses}
 \begin{tabular}{@{}rlll@{}}
 \toprule
@@ -310,6 +311,9 @@ $\tau$ & Roots & Exact Root Set $Z_{\Z}(f)$ & Construction / Family \\
 \textbf{13} & \textbf{10} & $\{-6,-5,-4,-2,-1,0,1,3,4,5\}$ & \textbf{Shifted Pronic-Square:} $q((q-16)^2-14^2)((q-16)^2-16)$ \\
 14 & 10 & $\{-5,-4,-3,-2,-1,0,1,2,3,4\}$ & Pronic-5 baseline: $q(2-q)(6-q)(12-q)(20-q)$ \\
 \textbf{15} & \textbf{11} & $\{-6,-5,-4,-2,-1,0,1,2,3,4,5\}$ & \textbf{Bonus extension:} $(\tau=13\text{ witness}) \cdot (x - 2)$ \\
+\textbf{16} & \textbf{12} & $\{-9,-7,-6,-3,-2,-1,0,1,2,5,6,8\}$ & \textbf{Folded pronic:} $((q-36)^2-36)((q-36)^2-36^2)(q-2)(q-6)$ \\
+\textbf{17} & \textbf{13} & $\{-196,-14,-6,-5,-4,-2,-1,0,1,3,4,5,14\}$ & \textbf{Square-Extraction:} $(\tau=13\text{ witness})(x+196)(q-(x+196))$ \\
+\textbf{18} & \textbf{14} & $\{-37,-9,-7,-6,-3,-2,-1,0,1,2,5,6,8,36\}$ & \textbf{Pronic Self-Shift:} $(\tau=16\text{ witness})((q-36)-36^2)$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -342,6 +346,20 @@ $\tau$ & Roots & Exact Root Set $Z_{\Z}(f)$ & Construction / Family \\
   $f(x) = x^{11} + 3x^{10} - 64x^9 - 138x^8 + 1437x^7 + 1827x^6 - 13126x^5 - 6492x^4 + 40552x^3 + 4800x^2 - 28800x$.
 \end{itemize}
 
+\subsection{Exact Bounded-Multiplication Sharpness ($m \le 4$)}
+Let $\mathrm{mul}(P)$ denote the number of $\times$ gates of a constant-free SLP $P$ (Lean: \code{SLP.mulCount}; every $\times$ gate is counted, and integer constants must be built from $1$, here by addition chains using \emph{zero} multiplications, which inflates $\tau$ but not $\mathrm{mul}(P)$). Every wire has degree at most $2^{\mathrm{mul}(P)}$, so $z_{\Z}(P) \le 2^{\mathrm{mul}(P)}$ (Lean: \code{slp\_natDegree\_le\_two\_pow\_mulCount}). This ceiling is exactly attained for small $m$:
+\begin{theorem}[Lean: \code{bounded\_mult\_exact\_sharpness\_four}]
+For $m \in \{0,1,2,3,4\}$, $\max\{z_{\Z}(P) : \mathrm{mul}(P) \le m,\ P \neq 0\} = 2^m$.
+\end{theorem}
+The cases $m \le 3$ follow from iterated pronic folds (e.g.\ $((x(x{+}1)-16)^2-106)^2-8100$ for $m=3$). For $m=4$, with $q = x(x+1)$, an exhaustive Diophantine search over preimage trees (all $a \le 200{,}000$) found six $4$-level folds with $16$ distinct integer roots, arising from sums of two squares such as $N = 67{,}405 = 5\cdot 13\cdot 17\cdot 61$. The smallest is
+\[
+  P(x) = \Bigl(\bigl((q-16851)^2 - 220362381\bigr)^2 - 2083869931842000\Bigr)^2 - 1832844567153600^2,
+\]
+with roots $\{-184,-180,-177,-172,-66,-51,-39,-6,5,38,50,65,171,176,179,183\}$ (Lean: \code{tau\_four\_mul\_sharp}, \code{slpFourMulSixteen\_mulCount}).
+\begin{remark}
+Iterated folding of this kind is classical in spirit; we claim only the specific witnesses, the exhaustive search, and their Lean formalization. This result concerns $\mathrm{mul}(P)$, not $\tau$: the $m=4$ witness has large $\tau$ and does not improve any finite-$\tau$ record.
+\end{remark}
+
 \subsection{Unconditional Asymptotic Linear Lower Bound}
 The pronic recurrence yields an infinite family of constant-free SLPs with asymptotic slope $2/3$:
 
@@ -365,12 +383,12 @@ using the finite-difference identity $(n+1)(n+2) - n(n+1) = 2(n+1)$. Since $x(x-
 
 \section{Lean~4.36.0 Formalization Artifact}\label{sec:lean}
 
-To place the algebraic foundations, the Simple-Root Modular Certificate theorem, the complete witness ladder up to $\tau = 15$, and the linear growth theorem beyond human transcription error, we formalized all four components in Lean~4.36.0 under \code{Research/PvsNP/Tau/}. Table~\ref{tab:lean} catalogs the four modules ($893$ lines total).
+To place the algebraic foundations, the Simple-Root Modular Certificate theorem, the complete witness ladder up to $\tau = 18$, the bounded-multiplication sharpness theorem, and the linear growth theorem beyond human transcription error, we formalized all components in Lean~4.36.0 under \code{Research/PvsNP/Tau/}. Table~\ref{tab:lean} catalogs the six modules ($1{,}401$ lines total).
 
 \begin{table}[ht]
 \centering
 \small
-\caption{Lean~4.36.0 formalization artifact (\code{Research/PvsNP/Tau/}, $893$ lines total). All modules compile with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.}
+\caption{Lean~4.36.0 formalization artifact (\code{Research/PvsNP/Tau/}, $1{,}401$ lines total). All modules compile with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.}
 \label{tab:lean}
 \begin{tabularx}{\textwidth}{@{}l r X@{}}
 \toprule
@@ -387,6 +405,12 @@ Module & LOC & Key Machine-Verified Definitions and Theorems \\
 \addlinespace[3pt]
 \code{TauRecords.lean} & 97 &
 \code{tau\_record\_11\_eight\_sym} ($\zmax(11) \ge 8$, symmetric midpoint), \code{tau\_record\_12\_nine} ($\zmax(12) \ge 9$, Midpoint Difference Trick), \code{tau\_record\_13\_ten} ($\zmax(13) \ge 10$, Shifted Pronic-Square), and \code{tau\_record\_15\_eleven} ($\zmax(15) \ge 11$, bonus extension). \\
+\addlinespace[3pt]
+\code{BoundedMult.lean} & 158 &
+\code{zMaxMulGe}, \code{tau\_mulCount\_intRootCount\_le\_two\_pow}, \code{slpThreeMulEight}, \code{tau\_zero\_mul\_sharp} through \code{tau\_three\_mul\_sharp}, and \code{bounded\_mult\_exact\_sharpness} ($m \le 3$). \\
+\addlinespace[3pt]
+\code{FoldingRecords.lean} & 350 &
+\code{tau\_record\_16\_twelve}, \code{tau\_record\_17\_thirteen}, \code{tau\_record\_18\_fourteen}, \code{slpFourMulSixteen} (exact $\mathrm{mul}=4$), \code{tau\_four\_mul\_sharp} (\code{zMaxMulGe 4 16}), \code{tau\_four\_mul\_intRootCount\_le\_sixteen}, and \code{bounded\_mult\_exact\_sharpness\_four} ($m \le 4$). \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -396,7 +420,7 @@ Every theorem in Table~\ref{tab:lean} is verified by Lean~4.36.0's kernel with \
 \end{remark}
 
 \section{Conclusion and Open Questions}
-We have unconditionally resolved the $7$-root threshold of the Shub--Smale $\tau$-conjecture over all of $\Z$ ($\zmax(9) = 6$, $\zmax(10) \ge 7$), discovered two gate-reuse mechanisms setting new constructive records $\zmax(12) \ge 9$, $\zmax(13) \ge 10$, and $\zmax(15) \ge 11$, proved $\zmax(3k) \ge 2k$, and formalized the underlying modular certification theorem and witness ladder in Lean~4.36.0. Two immediate frontiers remain open: (i) determining whether $\zmax(10) = 7$ or $8$ (the canonical $10$-gate tree is roughly $40\times$ larger than $\tau = 9$), and (ii) determining whether the gate-reuse slope $10/13 \approx 0.769$ can be sustained asymptotically beyond $2/3$---or whether superlinear growth $\zmax(\tau) = \omega(\tau)$ is achievable.
+We have unconditionally resolved the $7$-root threshold of the Shub--Smale $\tau$-conjecture over all of $\Z$ ($\zmax(9) = 6$, $\zmax(10) \ge 7$), discovered gate-reuse mechanisms setting new constructive records $\zmax(12) \ge 9$, $\zmax(13) \ge 10$, $\zmax(15) \ge 11$, $\zmax(16) \ge 12$, $\zmax(17) \ge 13$, and $\zmax(18) \ge 14$, showed that the degree ceiling $2^m$ on integer roots is exactly attained for $m \le 4$ multiplication gates, proved $\zmax(3k) \ge 2k$, and formalized the underlying modular certification theorem and witness ladder in Lean~4.36.0. Two immediate frontiers remain open: (i) determining whether $\zmax(10) = 7$ or $8$ (the canonical $10$-gate tree is roughly $40\times$ larger than $\tau = 9$), and (ii) determining whether the gate-reuse slope $10/13 \approx 0.769$ can be sustained asymptotically beyond $2/3$---or whether superlinear growth $\zmax(\tau) = \omega(\tau)$ is achievable.
 
 \begin{thebibliography}{9}
 
