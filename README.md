@@ -38,13 +38,21 @@ z_{\max}(1 \dots 9) = (1, 2, 3, 3, 4, 5, 5, 6, 6), \qquad z_{\max}(10) \ge 7.
 | **11** | $`\ge 8`$ *(new sym. family)* | Symmetric midpoint (`{-4..-1, 1..4}`) & pronic | `tau_record_11_eight_sym` |
 | **12** | $`\ge 9`$ *(new record)* | **Midpoint Difference Trick** (`{-4..4}`) | `tau_record_12_nine` |
 | **13** | $`\ge 10`$ *(new record)* | **Shifted Pronic-Square** (slope $`10/13 \approx 0.769`$) | `tau_record_13_ten` |
-| **15** | $`\ge 11`$ *(bonus record)* | Shifted Pronic-Square $`\times (x - 2)`$ | `tau_record_15_eleven` |
+| **15** | $`\ge 11`$ *(new record)* | Shifted Pronic-Square $`\times (x - 2)`$ | `tau_record_15_eleven` |
+| **16** | $`\ge 12`$ *(new record)* | Shifted Pronic-Square ($`a = 36`$) $`\times (q-2)(q-6)`$ | `tau_record_16_twelve` |
+| **17** | $`\ge 13`$ *(new record)* | **Square-Extraction Trick** ($`x + 196`$, $`x^2 - 196`$) | `tau_record_17_thirteen` |
+| **18** | $`\ge 14`$ *(new record)* | **Pronic Self-Shift Identity** ($`a + a^2 = a(a+1)`$) | `tau_record_18_fourteen` |
 
-3. **Machine-Verified Lean 4.36.0 Formalization (`0 sorryAx`, strictly `{propext, Classical.choice, Quot.sound}`):**
+3. **Exact Bounded-Multiplication Sharpness ($`m \in \{0, 1, 2, 3, 4\}`$):**
+   - Proved in Lean 4 (`bounded_mult_exact_sharpness_four`) that the trivial degree ceiling $`\max_{\mathrm{mulCount}(P) \le m} z_{\mathbb{Z}}(P) = 2^m`$ is **exact and sharp** for all $`m \in \{0, 1, 2, 3, 4\}`$ (`1, 2, 4, 8, 16`), including an explicit **4-multiplication** 4-level iterated fold achieving **16 distinct integer roots** (`tau_four_mul_sharp`, arising from the primitive Gaussian-integer norm $`67{,}405 = 5 \cdot 13 \cdot 17 \cdot 61`$)!
+
+4. **Machine-Verified Lean 4.36.0 Formalization (`0 sorryAx`, strictly `{propext, Classical.choice, Quot.sound}`):**
    - `Research/PvsNP/Tau/TauConjecture.lean` — Constant-free `SLP`, `ShubSmaleTauConjecture`, degree & multiplication root bounds, computable `zMaxGe_of_evalInt` witness certifier.
    - `Research/PvsNP/Tau/TauWitnesses.lean` — Verified witnesses for $`\tau = 6, 10, 11, 13`$ and 2-multiplication bound.
    - `Research/PvsNP/Tau/ModularRootBound.lean` — Unconditional proof of the **Simple-Root Modular Certificate** (`intRootCount_le_of_eval_zmod`) over all of $`\mathbb{Z}`$ and formalization of the classical pronic linear baseline `zMaxGe (3 * k) (2 * k)`.
    - `Research/PvsNP/Tau/TauRecords.lean` — Machine-verified new records for $`\tau = 11, 12, 13, 15`$.
+   - `Research/PvsNP/Tau/BoundedMult.lean` — Exact sharpness for $`m = 0, 1, 2, 3`$ (`1, 2, 4, 8` roots via `((x(x+1)-16)^2 - 106)^2 - 8100`).
+   - `Research/PvsNP/Tau/FoldingRecords.lean` — Zero-multiplication binary addition chains, exact sharpness for $`m = 4`$ (`16` roots), and new records for $`\tau = 16, 17, 18`$.
 
 ---
 
