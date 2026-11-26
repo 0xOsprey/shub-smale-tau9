@@ -71,6 +71,6 @@ python3 experiments/pvsnp/tau/tau_records_10_14.py
 ```bash
 cd experiments/pvsnp/tau
 cc -O3 -march=native -pthread tau_z9_unconditional.c -o tau_z9_unconditional
-./tau_z9_unconditional 9 6 /tmp/z9_survivors.bin
-python3 verify_z9_all_Z.py /tmp/z9_survivors.bin
+./tau_z9_unconditional 9 6 12 /tmp/z9_surv.txt
+python3 verify_z9_all_Z.py /tmp/z9_surv.txt 6 12
 ```
