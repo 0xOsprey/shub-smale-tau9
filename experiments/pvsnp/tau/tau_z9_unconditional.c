@@ -28,17 +28,41 @@
 #include <pthread.h>
 
 #define MAX_TAU 12
+#ifdef ALT_PRIMES
+/* Independent second prime triple for deterministic hash cross-check */
+#define MP 2147483629U   /* prime < 2^31 - 1 */
+#define P2 1000000021ULL /* prime */
+#define P3 1000000033ULL /* prime */
+#define HASH_X1 987654321U
+#define HASH_X2 123456789ULL
+#define HASH_X3 555555555ULL
+#else
 #define MP 2147483647U   /* 2^31 - 1 */
 #define P2 1000000009ULL
 #define P3 1000000007ULL
 #define HASH_X1 314159265U
 #define HASH_X2 271828182ULL
 #define HASH_X3 141421356ULL
+#endif
 
 #define P1_PRIME 31
 #define NUM_FALLBACK_PRIMES 3
 static const int FALLBACK_PRIMES[NUM_FALLBACK_PRIMES] = {19, 23, 29};
 
+#ifdef ALT_PRIMES
+static inline uint32_t madd(uint32_t a, uint32_t b) {
+    uint32_t s = a + b;
+    return s >= MP ? s - MP : s;
+}
+
+static inline uint32_t msub(uint32_t a, uint32_t b) {
+    return a >= b ? a - b : a + (MP - b);
+}
+
+static inline uint32_t mmul(uint32_t a, uint32_t b) {
+    return (uint32_t)(((uint64_t)a * (uint64_t)b) % (uint64_t)MP);
+}
+#else
 static inline uint32_t madd(uint32_t a, uint32_t b) {
     uint32_t s = a + b;
     s = (s & MP) + (s >> 31);
@@ -57,6 +81,7 @@ static inline uint32_t mmul(uint32_t a, uint32_t b) {
     s = (s & MP) + (s >> 31);
     return (uint32_t)(s >= MP ? s - MP : s);
 }
+#endif
 
 static inline uint8_t mod31_reduce(uint16_t t) {
     t = (t & 31U) + (t >> 5);
@@ -945,8 +970,14 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &t1);
     double dt = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) * 1e-9;
 
+#ifdef ALT_PRIMES
+    printf("CERTIFY [ALT_PRIMES P1=%u P2=%llu P3=%llu] tau=%d K=%d time=%.3fs (%.1fM leaves/s)\n",
+           MP, (unsigned long long)P2, (unsigned long long)P3,
+           tau, K, dt, (double)tot_leaves / (dt * 1e6 + 1e-9));
+#else
     printf("CERTIFY tau=%d K=%d time=%.3fs (%.1fM leaves/s)\n",
            tau, K, dt, (double)tot_leaves / (dt * 1e6 + 1e-9));
+#endif
     printf("  nodes_visited  = %llu\n", (unsigned long long)tot_nodes);
     printf("  leaves_checked = %llu\n", (unsigned long long)tot_leaves);
     printf("  cert_deg       = %llu (%.2f%%)\n", (unsigned long long)tot_deg, 100.0 * tot_deg / (tot_leaves + 1e-9));

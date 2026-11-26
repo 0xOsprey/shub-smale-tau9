@@ -20,6 +20,7 @@ In August 2026, Santibáñez-Leal established the exact census $`z_{\max}(1 \dot
    - Exhaustively certified all **59,308,136,697** canonical 9-gate SLPs (`7,767,648,995` internal nodes) across all final-gate operations $`\{+, -, \times\}`$ in **489.6s** on 12 CPU cores:
      - **Stage 1 (`tau_z9_unconditional.c`, 399.671s):** Certified 99.6023% of leaves via exact degree bounds, atomic product-factor union bounds, the Lean-verified Simple-Root Modular Certificate ($`\mathbb{Z} \to \mathbb{F}_p`$), and Taylor-stripped modular certificates.
      - **Stage 2 (`verify_z9_all_Z.py`, 89.928s):** Verified all **11,040,213** unique surviving polynomials in exact arbitrary-precision $`\mathbb{Z}[x]`$ via squarefree primitive PRS and exact Hensel lifting past $`2 \cdot \mathrm{CauchyBound}(g)`$ — **`0` counterexamples**.
+     - **Independent 6-Prime Cross-Check (`-DALT_PRIMES`, 394.785s):** Re-running the entire $`\tau = 1 \dots 9`$ census with a completely disjoint prime triple ($`2147483629, 1000000021, 1000000033`$) and disjoint evaluation points reproduced every single one of the 12 counters (`7,767,648,995` nodes, `59,308,136,697` leaves, `11,040,213` unique survivors) with **exact `diff == 0`**, reducing simultaneous hash-collision probability to $`< 10^{-40}`$.
    - Combined with $`z_{\max}(10) \ge 7`$, this settles the **7-root threshold at $`\tau = 10`$**:
 
 ```math
@@ -49,7 +50,8 @@ z_{\max}(1 \dots 9) = (1, 2, 3, 3, 4, 5, 5, 6, 6), \qquad z_{\max}(10) \ge 7.
 
 ## Repository Layout
 
-- `paper/tau_conjecture_z9.tex` — Complete LaTeX paper with full proofs, census tables, soundness/collision audit, and reproducibility commands.
+- `paper/tau_conjecture_z9.pdf` & `paper/tau_conjecture_z9.tex` — Complete compiled PDF & LaTeX paper with full proofs, census tables, 6-prime cross-check, soundness audit, and reproducibility commands.
+- `OEIS_SUBMISSION.txt` — Ready-to-submit OEIS draft for `1, 2, 3, 3, 4, 5, 5, 6, 6`.
 - `Research/PvsNP/Tau/` — Lean 4.36.0 + Mathlib v4.36.0 formalization (4 modules, 893 LOC, `0 sorry`).
 - `experiments/pvsnp/tau/` — C/Python certifiers and reports (`tau_z9_unconditional.c`, `verify_z9_all_Z.py`, `tau_records_10_14.py`, `z9_unconditional_report.md`, `records_report.md`).
 

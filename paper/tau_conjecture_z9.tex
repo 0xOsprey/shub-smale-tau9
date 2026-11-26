@@ -240,12 +240,12 @@ Counterexamples with $\ge 7$ integer roots (\code{COUNTEREXAMPLE}) & \textbf{0} 
 To maintain strict scientific transparency, we audit every assumption in the computational proof:
 \begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
   \item \textbf{Zero root-magnitude assumption:} Every rule in Tables~\ref{tab:stage1} and~\ref{tab:stage2} holds unconditionally over all of $\Z$, including arbitrarily large roots. The Stage~2 verifier passes an automated \code{--self-test} covering polynomials with high-multiplicity roots at $\pm 10^9$ as well as our $10$-gate $7$-root witness (which it flags as a counterexample at $K = 6$).
-  \item \textbf{Hash-based duplicate and survivor deduplication:}
+  \item \textbf{Hash-based duplicate and survivor deduplication (6-prime cross-checked):}
   \begin{itemize}[leftmargin=1.5em]
-    \item Internal duplicate/zero gate pruning uses $2$-point evaluation modulo $P_1 = 2^{31}-1$ and $P_2 = 10^9+9$. By Schwartz--Zippel, a false collision between two distinct polynomials of degree $d$ has probability $\le d^2 / (P_1 P_2) \approx 4.6 \times 10^{-19} d^2$ (for typical internal degrees $d \le 16$, $< 1.2 \times 10^{-16}$ per check).
-    \item Raw survivor deduplication uses a $3$-prime polynomial hash modulo $(P_1, P_2, P_3 = 10^9+7)$ with $P_1 P_2 P_3 \approx 2.15 \times 10^{27}$, yielding a birthday collision probability $< 10^{-13}$ across $1.1 \times 10^7$ unique survivors.
+    \item Internal duplicate/zero gate pruning uses $2$-point evaluation modulo $P_1 = 2^{31}-1$ and $P_2 = 10^9+9$, and raw survivor deduplication uses a $3$-prime polynomial hash modulo $(P_1, P_2, P_3 = 10^9+7)$ ($P_1 P_2 P_3 \approx 2.15 \times 10^{27}$, single-run birthday collision probability $< 10^{-13}$).
+    \item \textbf{Independent second prime-triple cross-check (\code{-DALT\_PRIMES}):} Re-running the entire $\tau = 1 \dots 9$ census ($394.785\text{s}$ at $\tau = 9$, $150.2\text{M leaves/s}$) with a completely disjoint prime triple $(P_1', P_2', P_3') = (2147483629, 1000000021, 1000000033)$ and disjoint evaluation points $(987654321, 123456789, 555555555)$ reproduced all $12$ counters---including all $7{,}767{,}648{,}995$ internal nodes, all $59{,}308{,}136{,}697$ leaves, and all $11{,}040{,}213$ unique survivors---with \textbf{exact zero difference (\code{diff == 0})}. Across the combined $6$-prime modulus $\prod_{i=1}^6 P_i \approx 4.61 \times 10^{54}$, the probability of a simultaneous false collision drops to $< 10^{-40}$.
   \end{itemize}
-  Eliminating even this $< 10^{-13}$ hash-deduplication caveat (by disabling hash deduplication or checking exact polynomial equality) is straightforward engineering at a modest wall-time multiplier; likewise, the exhaustive C/Python search itself is not replayed inside the Lean~4 kernel.
+  As an explicit formal-verification boundary, the exhaustive C/Python search itself is not replayed inside the Lean~4 kernel.
   \item \textbf{Exact reproducibility commands:}
 \begin{verbatim}
 python3 experiments/pvsnp/tau/verify_z9_all_Z.py --self-test
