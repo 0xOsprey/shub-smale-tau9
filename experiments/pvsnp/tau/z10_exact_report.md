@@ -15,7 +15,7 @@ Combined with the Lean 4 machine-verified 10-gate 7-root witnesses (`tau_witness
 Executed on 12 CPU cores (Apple M3 Pro) across all **8,774** `--split 4` work items in 18 checkpointed batches (`500` items/batch, peak disk `< 20 GB`, C search wall time `17,449.9s = 4.85h`):
 
 - **Total canonical internal nodes:** `368,616,396,762` (`9,303` split-4 prefix nodes + `368,616,387,459` worker internal nodes)
-- **Total canonical 10-gate leaves checked:** **`2,675,837,421,376`** (`45.1×` larger than $\tau = 9$)
+- **Total candidate 10-gate leaves checked (superset of all canonical 10-gate SLPs):** **`2,675,837,421,376`** (`45.1×` larger than $\tau = 9$; leaf-level duplicate/zero filtering occurs inside `check_leaf` after fast bounds, so non-canonical leaf duplicates such as `1 * 1` at $\tau = 1$ are included in `leaves_checked`)
 
 | Certification Mechanism | Leaves Certified | Share of Total |
 |---|---:|---:|
@@ -56,8 +56,8 @@ All **`1,333,049,433`** per-item exact-deduped survivors across all 18 batches w
 | Skipped (`exact deg <= 7`) | 5,933,285 |
 | **Total (`processed == nonempty`)** | **1,333,049,433** |
 
-- Finding **19** exact 7-root polynomials in the wild (`max_z = 7`, `hits = 0` above 7) serves as a live in-search canary confirming that high-root $\tau = 10$ polynomials pass through the C pipeline to exact verification.
+- Finding **19** seven-root survivor records (per-item deduplicated across the 8,774 work items, so not necessarily 19 globally distinct polynomials; `max_z = 7`, `hits = 0` above 7) serves as a live in-search canary confirming that high-root $\tau = 10$ polynomials pass through the C pipeline to exact verification.
 
 ### Formal Verification Boundary (Lean 4.36.0)
 
-`Research/PvsNP/Tau/Canonical.lean` (`zmax10_le_seven_of_checklist`) and `Research/PvsNP/Tau/CertSoundness.lean` (`0 sorry`, strictly `{propext, Classical.choice, Quot.sound}`) formally prove that if the canonical checklist up to $\tau = 10$ is complete with $\le 7$ roots per polynomial, then $z_{\max}(10) \le 7$ over all of $\mathbb{Z}$. Only the raw C enumeration loop and FLINT/Python execution remain outside the Lean kernel.
+`Research/PvsNP/Tau/Canonical.lean` (`zmax10_le_seven_of_checklist`) and `Research/PvsNP/Tau/CertSoundness.lean` (`0 sorry`, strictly `{propext, Classical.choice, Quot.sound}`) formally prove the conditional implication `hcheck → ∀ t ≤ 10, ∀ P : SLP t, P.evalPoly ≠ 0 → intRootCount P.evalPoly ≤ 7`, where `hcheck` requires certifying all canonical gate lists of **every** length $1 \le n \le 10$ (here supplied externally by the $\tau = 1 \dots 9$ certification with $K = 6 \le 7$ plus this $\tau = 10$ run with $K = 7$). The raw C enumeration loop and FLINT/Python execution remain outside the Lean kernel. Per-item counts and SHA-256 digests are published in [`reproduce/digests/`](../../../reproduce/digests/).

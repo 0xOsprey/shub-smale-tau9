@@ -25,7 +25,7 @@ Our own red-team audit also caught real bugs & overclaims (all logged in `audit/
 **Tweet 3/6 (Zero Hash-Collision Trust):**
 We replaced hash-only pruning with exact multi-point CRT confirmation over 61-bit primes on every hash hit (`tau_certify_exact.c`).
 
-Re-running all 59,308,136,697 canonical 9-gate SLPs (442s on 8 cores, +13.6% overhead):
+Re-running all 59,308,136,697 candidate 9-gate leaves (superset of all canonical 9-gate SLPs, plus $\tau=1\dots 8$; 442s on 8 cores, +13.6% overhead):
 - 1,432,372,962 dup hash hits -> 100% exact-CRT confirmed, **0 false positives**
 - 207,134,139 survivor hits -> 100% exact-CRT confirmed, **0 false positives**
 - Disjoint `-DALT_PRIMES` cross-check: **per-item `diff == 0`** across all 485 work items
@@ -40,13 +40,13 @@ To test the pruning rules themselves without shared code:
 **Tweet 5/6 (Formal Soundness in Lean 4):**
 We formalized the soundness of every canonicalization rule (sign symmetry, dead-gate bounds, duplicate/zero elimination, lex-minimal topological ordering) and every per-leaf certificate (degree, product mask, dual-number modular, Taylor-stripped, CRT) in Lean 4.36.0 (`Canonical.lean` + `CertSoundness.lean`):
 - 8 modules, 4,228 LOC, 204 theorems/lemmas, **0 `sorry`**, strictly `{propext, Classical.choice, Quot.sound}`.
-- Main theorem `zmax9_le_six_of_checklist`: if the canonical checklist is complete, $z_{\max}(9) \le 6$. Only the raw C enumeration loop remains outside the Lean kernel.
+- Main theorems `zmax9_le_six_of_checklist` / `zmax10_le_seven_of_checklist`: prove `hcheck → z_max(τ) ≤ K` (where `hcheck` requires all canonical gate lists of lengths $1 \le n \le \tau$). Only the raw C enumeration loop and FLINT/Python runs remain outside the Lean kernel.
 
 **Tweet 6/7 (New Exact Result: $z_{\max}(10) = 7$):**
-Running the hardened exact-CRT pipeline on $\tau = 10, K = 7$ (all **2,675,837,421,376** canonical 10-gate SLPs across 8,774 checkpointed work items):
+Running the hardened exact-CRT pipeline on $\tau = 10, K = 7$ (all **2,675,837,421,376** candidate 10-gate leaves across 8,774 checkpointed work items, plus $\tau=1\dots 9$):
 - 58.1B dup hits + 10.7B survivor hits -> 100% exact-CRT confirmed, **0 false positives**
 - Disjoint `-DALT_PRIMES` rerun across all 8,774 work items: **per-item `diff == 0`**
-- All 1,333,049,433 per-item survivors verified by `python-flint`: **19** exact 7-root polynomials, **0** with $\ge 8$ roots.
+- All 1,333,049,433 per-item survivor records verified by `python-flint`: **19** seven-root survivor records (per-item deduplicated), **0** with $\ge 8$ roots.
 
 Exact sequence: $z_{\max}(1\dots 10) = (1, 2, 3, 3, 4, 5, 5, 6, 6, 7)$, $z_{\max}(11) \ge 8$.
 

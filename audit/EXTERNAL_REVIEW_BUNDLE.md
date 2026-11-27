@@ -1,6 +1,6 @@
 # External Adversarial Review Bundle (Copy-Paste Ready for a Second Model or Human Mathematician)
 
-> **How to use this file:** Copy everything below the horizontal rule and paste it into a **completely different AI model** (e.g., Claude / GPT / o3 in a fresh session) or send it to a human mathematician. It contains the exact verbatim Lean 4 definitions/theorems and the exact verbatim C core (`dfs`, `check_leaf`, `exact_check_rel`, `compute_hash_and_check_dup`) that sit at the trust boundary of $z_{\max}(9) = 6$ and $z_{\max}(10) = 7$.
+> **How to use this file:** Copy everything below the horizontal rule and paste it into a **completely different AI model** (e.g., Claude / GPT / o3 in a fresh session) or send it to a human mathematician. It contains verbatim Lean 4 definitions/theorems and **excerpts** of the C core (`dfs`, `check_leaf`, `exact_check_rel`, `compute_hash_and_check_dup_ex`) that sit at the trust boundary of $z_{\max}(9) = 6$ and $z_{\max}(10) = 7$. Pinned full-source links (commit `0ee42a8`) are provided for every excerpted block.
 
 ---
 
@@ -141,7 +141,9 @@ theorem zmax10_le_seven_of_checklist
 
 ---
 
-## Section 3 — Verbatim C DFS Enumeration Loop (`experiments/pvsnp/tau/tau_certify_exact.c`, lines 1300–1430)
+## Section 3 — C DFS Enumeration Loop Excerpt (`experiments/pvsnp/tau/tau_certify_exact.c`, lines 1300–1430; mutation/dump `#ifdef`s omitted)
+
+Pinned full unabridged source: https://github.com/0xOsprey/shub-smale-tau9/blob/0ee42a8/experiments/pvsnp/tau/tau_certify_exact.c#L1300-L1430
 
 ```c
 static inline void check_leaf_pair(SearchCtx *ctx, int depth, int idx, int i, int j) {
@@ -225,7 +227,12 @@ static void dfs(SearchCtx *ctx, int depth, uint32_t unused_mask, int unused_cnt)
 
 ---
 
-## Section 4 — Verbatim C Leaf Certifier & Exact-CRT Confirm-on-Hit (`tau_certify_exact.c`, lines 641–853 & 1150–1298)
+## Section 4 — C Leaf Certifier & Exact-CRT Confirm-on-Hit Excerpt (`tau_certify_exact.c`, lines 641–853 & 1150–1298; ellipses at `eval_q0` / inner CRT loop / `known_doubles`)
+
+Pinned full unabridged source:
+- `exact_check_rel` & `compute_hash_and_check_dup_ex`: https://github.com/0xOsprey/shub-smale-tau9/blob/0ee42a8/experiments/pvsnp/tau/tau_certify_exact.c#L641-L853
+- `check_leaf`: https://github.com/0xOsprey/shub-smale-tau9/blob/0ee42a8/experiments/pvsnp/tau/tau_certify_exact.c#L1150-L1298
+- `certify_taylor_roots` & `certify_slp_mod_p`: https://github.com/0xOsprey/shub-smale-tau9/blob/0ee42a8/experiments/pvsnp/tau/tau_certify_exact.c#L955-L1147
 
 ```c
 /* Exact CRT check: returns 1 iff candidate gate (op,i,j) == 0 (sign==0) or sign*wire[target_m] (sign=+-1).

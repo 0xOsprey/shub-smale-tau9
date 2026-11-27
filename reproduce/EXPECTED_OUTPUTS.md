@@ -73,7 +73,15 @@ Expected: 8 modules under `Research/PvsNP/Tau/` (4,228 LOC, 204 theorem/lemma de
 - `survivors_uniq` (per-item deduped): `1,333,049,433`
 - `dup_hash_hits`: `58,105,780,935` (`dup_exact_confirmed = 58,105,780,935`, `dup_false_positive = 0`)
 - `surv_hash_hits`: `10,719,150,277` (`surv_exact_confirmed = 10,719,150,277`, `surv_false_positive = 0`)
-- `audit/flint_roots.py` (all 18 batches, `processed == nonempty == 1,333,049,433`):
-  - `HIST z=0: 131,545,405; z=1: 724,188,908; z=2: 356,137,666; z=3: 109,874,319; z=4: 5,102,526; z=5: 259,635; z=6: 7,670; z=7: 19`
+- `audit/flint_roots.py` (all 18 batches, `processed == nonempty == 1,333,049,433` per-item deduplicated survivor records):
+  - `HIST z=0: 131,545,405; z=1: 724,188,908; z=2: 356,137,666; z=3: 109,874,319; z=4: 5,102,526; z=5: 259,635; z=6: 7,670; z=7: 19` *(19 seven-root survivor records, per-item deduplicated, not necessarily 19 globally distinct polynomials)*
   - `skipped_deg_le_7 = 5,933,285`, `factored = 1,327,116,148`, `max_z = 7`, `hits = 0` (`z_max(10) = 7`).
-- `-DALT_PRIMES` full 8,774-item cross-check: `per-item diff == 0` across all 8,774 rows of `done.tsv` (`0` false positives).
+- `-DALT_PRIMES` full 8,774-item cross-check (`./reproduce/reproduce.sh tau10-alt`): `per-item diff == 0` across all 8,774 rows of `done.tsv` (`0` false positives).
+
+## 5. Published Per-Item Digests (`reproduce/digests/`)
+
+Sorted `done.tsv` tables (comment lines stripped) are committed in `reproduce/digests/` so any independent reproduction can verify exact per-item agreement:
+- `tau9_k6_items.tsv.gz` (`485` rows; default & `-DALT_PRIMES` identical): SHA-256 `3b03202de9631c40f9e3caf066b58ef0380353c1db3d7f88539abf2b7185eed4`
+- `tau10_k7_items.tsv.gz` (`8,774` rows; default & `-DALT_PRIMES` identical): SHA-256 `fead26c8984cd7ea5f297a7ff60a1158de21396f836806240f3a027acd4a8942`
+
+Note on `leaves_checked`: `tau_certify_exact.c` enumerates **candidate leaves** (a superset of all canonical $\tau$-gate SLPs) because leaf-level duplicate/zero filtering occurs inside `check_leaf` after fast degree/product/mod-31 checks (for instance, `1 * 1` is counted in `leaves_checked = 7` at $\tau = 1$). Also note that Lean's `zmax_le_of_checklist` proves the implication `hcheck → ∀ t ≤ τ, ...`, where `hcheck` requires certifying all canonical gate lists of **all shorter lengths** $1 \le n \le \tau$.
