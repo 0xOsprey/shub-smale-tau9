@@ -26,7 +26,7 @@
 \newcommand{\zmax}{z_{\max}}
 \newcommand{\zZ}{z_{\Z}}
 
-\title{Resolving the 7-Root Threshold of the Shub--Smale $\tau$-Conjecture: Unconditional $\zmax(9) = 6$, New Record Witnesses up to $\tau = 18$, and Lean~4 Certification}
+\title{Resolving the 7- and 8-Root Thresholds of the Shub--Smale $\tau$-Conjecture: Exact-CRT Certification of $\zmax(9) = 6$ and $\zmax(10) = 7$, Record Witnesses up to $\tau = 18$, and Lean~4 Soundness Proofs}
 
 \author{Research Paper --- Computational Algebra, Exhaustive Certification, and Lean~4 Formalization}
 
@@ -36,19 +36,19 @@
 \maketitle
 
 \begin{abstract}
-Smale's 4th Problem---the Shub--Smale $\tau$-conjecture---asserts that the number of distinct integer roots $\zZ(f)$ of any nonzero univariate polynomial $f \in \Z[x]$ is bounded polynomially in its constant-free straight-line program (SLP) complexity $\tau(f)$; an affirmative resolution implies $\mathrm{P}_{\C} \neq \mathrm{NP}_{\C}$ in the Blum--Shub--Smale (BSS) model of computation. Recently, Santiba\~{n}ez-Leal (August 2026) established the exact census $\zmax(1 \dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)$ together with $\zmax(10) \ge 7$, and in a revision ruled out $9$-gate SLPs whose final gate is a multiplication, leaving open whether additive or subtractive final gates at $\tau = 9$ can achieve $7$ distinct integer roots.
+Smale's 4th Problem---the Shub--Smale $\tau$-conjecture---asserts that the number of distinct integer roots $\zZ(f)$ of any nonzero univariate polynomial $f \in \Z[x]$ is bounded polynomially in its constant-free straight-line program (SLP) complexity $\tau(f)$; an affirmative resolution implies $\mathrm{P}_{\C} \neq \mathrm{NP}_{\C}$ in the Blum--Shub--Smale (BSS) model of computation. Recently, Santiba\~{n}ez-Leal (August/September 2026) established the exact census $\zmax(1 \dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)$ together with $\zmax(10) \ge 7$, and in a revision ruled out $9$-gate SLPs whose final gate is a multiplication, leaving open whether additive or subtractive final gates at $\tau = 9$ can achieve $7$ distinct integer roots and whether $\zmax(10)$ equals $7$ or $8$.
 
-We close the full unrestricted $\tau = 9$ space unconditionally over all of $\Z$ and advance both the exact census and the finite-$\tau$ constructive frontier:
+We close the full unrestricted $\tau = 9$ and $\tau = 10$ frontiers unconditionally over all of $\Z$ (zero root-magnitude cutoff, zero hash-collision reliance) and advance the constructive record ladder:
 \begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
-  \item \textbf{Unconditional $\zmax(9) = 6$ over all of $\Z$:} Removing any root-magnitude window assumption and covering all final-gate operations ($+, -, \times$), we certify all $59{,}308{,}136{,}697$ canonical $9$-gate SLPs ($7{,}767{,}648{,}995$ internal nodes) in $489.6\text{s}$ on $12$ CPU cores using a magnitude-free modular/Taylor certification cascade in C ($399.671\text{s}$) followed by exact arbitrary-precision $\Z[x]$ squarefree decomposition and Hensel lifting on all $11{,}040{,}213$ unique survivors ($89.928\text{s}$), finding $0$ counterexamples. Combined with $\zmax(10) \ge 7$ (established by Santiba\~{n}ez-Leal and independently Lean-verified here), this settles the $7$-root threshold at $\tau = 10$:
+  \item \textbf{Hardened exact-CRT certification of $\zmax(9) = 6$ and $\zmax(10) = 7$ over all of $\Z$:} Covering all final-gate operations ($+, -, \times$), our exact-CRT certifier (\code{tau\_certify\_exact.c}) confirms every hash hit deterministically via multi-point Chinese Remainder Theorem evaluation over $61$-bit primes ($0$ false positives across all $1.64 \times 10^9$ hits at $\tau = 9$ and all $6.88 \times 10^{10}$ hits at $\tau = 10$). At $\tau = 9$ ($59{,}308{,}136{,}697$ canonical leaves), all $28{,}755{,}668$ per-item exact-deduped survivors pass both pure-Python $\Z[x]$ Hensel verification and independent \code{python-flint} factorization with $0$ counterexamples ($\max z = 6$). At $\tau = 10$ ($2{,}675{,}837{,}421{,}376$ canonical leaves across $8{,}774$ checkpointed work items), all $1{,}333{,}049{,}433$ per-item exact-deduped survivors pass \code{python-flint} factorization, finding $19$ exact $7$-root polynomials and $0$ polynomials with $\ge 8$ roots; a full disjoint \code{-DALT\_PRIMES} rerun reproduces every counter on every work item (\code{per-item diff == 0}). Combined with Lean-verified witnesses at $\tau = 10$ ($7$ roots) and $\tau = 11$ ($8$ roots), this settles both the $7$-root and $8$-root thresholds:
   \[
-    \zmax(1 \dots 9) = (1, 2, 3, 3, 4, 5, 5, 6, 6), \qquad \zmax(10) \ge 7.
+    \zmax(1 \dots 10) = (1, 2, 3, 3, 4, 5, 5, 6, 6, 7), \qquad \zmax(11) \ge 8.
   \]
-  \item \textbf{New record finite-$\tau$ witnesses at $\tau = 11, 12, 13, 15$:} We introduce two new algebraic gate-reuse constructions: the \emph{Midpoint Difference Trick}, yielding a symmetric $8$-root witness at $\tau = 11$ and $9$ distinct integer roots at $\tau = 12$, and \emph{Shifted Pronic-Square Root Quadrupling with Gate Reuse}, yielding $10$ distinct integer roots at $\tau = 13$ (achieving slope $10/13 \approx 0.769 > 2/3$) and $11$ distinct integer roots at $\tau = 15$. We also give a Lean-verified formalization of the classical linear-rate pronic-folding baseline $\zmax(3k) \ge 2k$ for all $k \ge 1$.
-  \item \textbf{Further records and exact bounded-multiplication sharpness:} Extending the same gate-reuse ideas gives $\zmax(16) \ge 12$, $\zmax(17) \ge 13$ (\emph{Square-Extraction Trick}) and $\zmax(18) \ge 14$ (\emph{Pronic Self-Shift Identity}). Separately, we show that the trivial degree ceiling is exactly attained: among constant-free SLPs with at most $m$ multiplication gates, the maximum number of distinct integer roots is exactly $2^m$ for $m \in \{0,1,2,3,4\}$, with an explicit $4$-multiplication witness having $16$ distinct integer roots (found by a Diophantine preimage search).
-  \item \textbf{Machine-verified Lean~4.36.0 artifact:} We formalize the SLP model, all canonicalization and dead-gate pruning soundness reductions (\code{exists\_canonical}, \code{deadgate\_count\_bound}, \code{zmax9\_le\_six\_of\_checklist}), all per-leaf certificate rules (degree bound, atomic product mask, dual-number modular evaluation, Taylor-stripped modular certificate, and exact CRT zero check), all record witnesses up to $\tau = 18$, the $m \le 4$ bounded-multiplication sharpness theorem, and the pronic linear growth theorem across eight Lean~4 modules ($4{,}228$ lines total, $204$ theorem/lemma declarations), compiling with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.
+  \item \textbf{New record finite-$\tau$ witnesses at $\tau = 11 \dots 18$:} We introduce algebraic gate-reuse constructions---the \emph{Midpoint Difference Trick}, \emph{Shifted Pronic-Square Root Quadrupling}, the \emph{Square-Extraction Trick}, and the \emph{Pronic Self-Shift Identity}---achieving $\zmax(12) \ge 9$, $\zmax(13) \ge 10$ (slope $10/13 \approx 0.769 > 2/3$), $\zmax(15) \ge 11$, $\zmax(16) \ge 12$, $\zmax(17) \ge 13$, and $\zmax(18) \ge 14$, alongside a Lean-verified formalization of the classical pronic linear baseline $\zmax(3k) \ge 2k$.
+  \item \textbf{Exact bounded-multiplication sharpness ($m \le 4$):} Among constant-free SLPs with at most $m$ multiplication gates (constants built by addition chains), the degree ceiling is exactly attained for $m \in \{0,1,2,3,4\}$: $\max_{\mathrm{mul}(P) \le m} \zZ(P) = 2^m$, including an explicit $4$-multiplication witness with $16$ distinct integer roots.
+  \item \textbf{Machine-verified Lean~4.36.0 soundness proofs and adversarial audit:} Eight Lean~4 modules ($4{,}228$ lines, $204$ theorem/lemma declarations, zero \code{sorryAx}, strictly $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$) formalize all canonicalization and dead-gate pruning reductions (\code{exists\_canonical}, \code{deadgate\_count\_bound}, \code{zmax9\_le\_six\_of\_checklist}, \code{zmax10\_le\_seven\_of\_checklist}), all per-leaf certificate rules (degree, atomic product mask, dual-number modular, Taylor-stripped, and CRT exact-zero), and all witnesses. An independent naive Rust enumerator ($\tau \le 7$, $0$ missing / $0$ extra polynomials) and a mutation/canary suite further audit the implementation; only the raw C enumeration loop and FLINT/Python execution remain outside the Lean kernel.
 \end{enumerate}
-We include a transparent soundness and hash-collision audit delineating exact proof boundaries and full reproducibility commands.
+This work does not resolve $\mathrm{P}$ vs $\mathrm{NP}$ or the asymptotic $\tau$-conjecture. It was developed with AI assistance (Antigravity Harness + Gemini 4 Neon) and audited via independent reimplementation, Lean~4 kernel checks, and transparent bug logging (\code{audit/BUGS.md}).
 \end{abstract}
 
 \section{Introduction}
@@ -67,18 +67,23 @@ While trivial multiplication-chain bounds give $\deg(f) \le 2^{\tau(f)}$ and hen
 established $\zmax(10) \ge 7$ via explicit $10$-gate witnesses, and in an updated revision ruled out all $9$-gate SLPs ending in a multiplication gate---leaving open whether an additive or subtractive final gate at $\tau = 9$ can produce $7$ distinct integer roots.
 
 \subsection{Summary of Main Results}
-We settle the $\tau = 9$ frontier unconditionally over all of $\Z$, push the constructive record ladder through $\tau = 15$, and back the algebraic theory with a Lean~4.36.0 formalization:
+We settle both the $\tau = 9$ and $\tau = 10$ frontiers unconditionally over all of $\Z$, push the constructive record ladder through $\tau = 18$, and back the algebraic theory and pruning rules with a Lean~4.36.0 formalization:
 
 \begin{enumerate}[label=\textbf{Result \arabic*.},leftmargin=2.2em]
-  \item \textbf{Unconditional $\zmax(9) = 6$ over all of $\Z$ (Section~\ref{sec:census}).}
-  Every nonzero polynomial computable by a constant-free SLP of length $\tau \le 9$ has at most $6$ distinct integer roots in all of $\Z$ (with no bound on root magnitude). Our two-stage certifier inspects all $59{,}308{,}136{,}697$ canonical $9$-gate leaves ($7{,}767{,}648{,}995$ internal nodes) in $489.6\text{s}$ on $12$ cores: Stage~1 certifies $99.6023\%$ of leaves directly via magnitude-free degree, atomic product-factor, modular simple-root, and Taylor-stripped certificates; Stage~2 verifies all $11{,}040{,}213$ unique surviving polynomials in exact arbitrary-precision $\Z[x]$ arithmetic via squarefree decomposition and Hensel lifting past $2 \cdot \mathrm{CauchyBound}(g)$, finding $0$ counterexamples. Coupled with our verified $10$-gate $7$-root witnesses, this proves
+  \item \textbf{Hardened exact-CRT $\zmax(9) = 6$ and $\zmax(10) = 7$ over all of $\Z$ (Section~\ref{sec:census}).}
+  Every nonzero polynomial computable by a constant-free SLP of length $\tau \le 9$ has at most $6$ distinct integer roots in all of $\Z$, and every nonzero polynomial computable by a length $\tau \le 10$ SLP has at most $7$ distinct integer roots in all of $\Z$ (no root-magnitude cutoff, zero hash-collision reliance). Our hardened exact-CRT certifier (\code{tau\_certify\_exact.c}) confirms every hash hit via multi-point CRT over $61$-bit primes ($0$ false positives across $1.64 \times 10^9$ hits at $\tau = 9$ and $6.88 \times 10^{10}$ hits at $\tau = 10$):
+  \begin{itemize}[leftmargin=1.5em]
+    \item At $\tau = 9$ ($59{,}308{,}136{,}697$ canonical leaves), all $28{,}755{,}668$ per-item exact-deduped survivors pass both pure-Python $\Z[x]$ verification (\code{verify\_survivors.py}) and \code{python-flint} factorization (\code{audit/flint\_roots.py}) with $0$ counterexamples ($\max z = 6$).
+    \item At $\tau = 10$ ($2{,}675{,}837{,}421{,}376$ canonical leaves across $8{,}774$ work items), all $1{,}333{,}049{,}433$ per-item exact-deduped survivors pass \code{python-flint} factorization, yielding $19$ exact $7$-root polynomials and $0$ polynomials with $\ge 8$ roots; a full disjoint \code{-DALT\_PRIMES} rerun reproduces every counter on every work item (\code{per-item diff == 0}).
+  \end{itemize}
+  Coupled with our Lean-verified witnesses at $\tau = 10$ ($7$ roots) and $\tau = 11$ ($8$ roots), this proves
   \[
-    \zmax(1 \dots 9) = (1, 2, 3, 3, 4, 5, 5, 6, 6), \qquad \zmax(10) \ge 7.
+    \zmax(1 \dots 10) = (1, 2, 3, 3, 4, 5, 5, 6, 6, 7), \qquad \zmax(11) \ge 8.
   \]
-  \item \textbf{New record witnesses at $\tau = 12, 13, 15$ and asymptotic linear growth (Section~\ref{sec:records}).}
-  We establish new record lower bounds $\zmax(12) \ge 9$ via the \emph{Midpoint Difference Trick}, $\zmax(13) \ge 10$ via \emph{Shifted Pronic-Square Root Quadrupling with Gate Reuse} (achieving root-to-gate ratio $10/13 \approx 0.769 > 2/3$), and $\zmax(15) \ge 11$, alongside a new symmetric $8$-root witness at $\tau = 11$ and a consecutive pronic-$5$ baseline $\zmax(14) \ge 10$. We further prove the unconditional infinite family $\zmax(3k) \ge 2k$ for all $k \ge 1$.
+  \item \textbf{New record witnesses for $\tau = 11 \dots 18$, bounded-multiplication sharpness, and linear growth (Section~\ref{sec:records}).}
+  We establish new record lower bounds $\zmax(12) \ge 9$ via the \emph{Midpoint Difference Trick}, $\zmax(13) \ge 10$ via \emph{Shifted Pronic-Square Root Quadrupling with Gate Reuse} (achieving root-to-gate ratio $10/13 \approx 0.769 > 2/3$), $\zmax(15) \ge 11$, $\zmax(16) \ge 12$, $\zmax(17) \ge 13$ (\emph{Square-Extraction Trick}), and $\zmax(18) \ge 14$ (\emph{Pronic Self-Shift Identity}), prove $\max_{\mathrm{mul}(P) \le m} \zZ(P) = 2^m$ for $m \le 4$, and formalize the unconditional infinite family $\zmax(3k) \ge 2k$ for all $k \ge 1$.
   \item \textbf{Lean~4.36.0 formalization artifact (Section~\ref{sec:lean}).}
-  Eight Lean~4 modules (\code{TauConjecture.lean}, \code{TauWitnesses.lean}, \code{ModularRootBound.lean}, \code{TauRecords.lean}, \code{BoundedMult.lean}, \code{FoldingRecords.lean}, \code{Canonical.lean}, and \code{CertSoundness.lean}; $4{,}228$ lines total, $204$ theorem/lemma declarations) formalize the SLP semantics, all canonicalization and dead-gate pruning soundness reductions (\code{exists\_canonical}, \code{deadgate\_count\_bound}, \code{zmax9\_le\_six\_of\_checklist}), all per-leaf certificate rules (degree, product mask, dual-number modular, Taylor-stripped, and CRT exact-zero checks), every record witness up to $\tau = 18$, exact bounded-multiplication sharpness for $m \le 4$, and the linear lower bound \code{tau\_pronic\_linear\_growth}, with zero \code{sorryAx} and strictly standard axioms.
+  Eight Lean~4 modules (\code{TauConjecture.lean}, \code{TauWitnesses.lean}, \code{ModularRootBound.lean}, \code{TauRecords.lean}, \code{BoundedMult.lean}, \code{FoldingRecords.lean}, \code{Canonical.lean}, and \code{CertSoundness.lean}; $4{,}228$ lines total, $204$ theorem/lemma declarations) formalize the SLP semantics, all canonicalization and dead-gate pruning soundness reductions (\code{exists\_canonical}, \code{deadgate\_count\_bound}, \code{zmax9\_le\_six\_of\_checklist}, \code{zmax10\_le\_seven\_of\_checklist}), all per-leaf certificate rules (degree, product mask, dual-number modular, Taylor-stripped, and CRT exact-zero checks), every record witness up to $\tau = 18$, exact bounded-multiplication sharpness for $m \le 4$, and the linear lower bound \code{tau\_pronic\_linear\_growth}, with zero \code{sorryAx} and strictly standard axioms.
 \end{enumerate}
 
 \section{Mathematical Certification Framework}\label{sec:framework}
@@ -151,7 +156,7 @@ The complete certification pipeline combines four C-level rules with an exact $\
   \end{itemize}
 \end{enumerate}
 
-\section{Unconditional $\tau = 9$ Census Over All of $\Z$}\label{sec:census}
+\section{Unconditional $\tau = 9$ and $\tau = 10$ Census Over All of $\Z$}\label{sec:census}
 
 \subsection{Machine-Checked Lossless Canonicalization Rules}
 To exhaust all constant-free SLPs of length $\tau$ without redundancy, \code{tau\_certify\_exact.c} (and the original \code{tau\_z9\_unconditional.c}) enforces four canonicalization rules, each formally proved lossless in Lean~4 (\code{Canonical.lean}: \code{exists\_canonical}, \code{deadgate\_count\_bound}, \code{unusedWires\_last\_gate}, \code{zmax9\_le\_six\_of\_checklist}) for minimal-length SLPs computing nonzero polynomials over $\Z[x]$:
@@ -162,17 +167,17 @@ To exhaust all constant-free SLPs of length $\tau$ without redundancy, \code{tau
   \item \textbf{Lex-minimal topological ordering:} If gate $g_k$ does not depend on $g_{k-1}$, we enforce $\mathrm{key}(k) \ge \mathrm{key}(k-1)$, eliminating commuting-gate permutations.
 \end{enumerate}
 
-\subsection{Complete Unconditional Census ($\tau = 1 \dots 9$)}
-All runs were executed on $12$ CPU cores (\code{clang -O3 -march=native -pthread} and a $12$-worker Python~3 pool). Table~\ref{tab:census} reports the complete unconditional census for $\tau = 1 \dots 9$.
+\subsection{Complete Unconditional Census ($\tau = 1 \dots 10$)}
+All runs were executed on $12$ CPU cores (\code{clang -O3 -march=native -pthread}, a $12$-worker Python~3 pool, and \code{python-flint}). Table~\ref{tab:census} reports the complete unconditional census for $\tau = 1 \dots 10$.
 
 \begin{table}[ht]
 \centering
-\small
-\caption{Complete unconditional $\Z$-wide census for $\tau = 1 \dots 9$ on $12$ CPU cores. Every $\tau$ yields $0$ counterexamples above the certified bound $\zmax(\tau)$.}
+\footnotesize
+\caption{Complete unconditional $\Z$-wide census for $\tau = 1 \dots 10$ on $12$ CPU cores. Every $\tau$ yields $0$ counterexamples above the certified bound $\zmax(\tau)$.}
 \label{tab:census}
 \begin{tabular}{@{}rrrrrrrrr@{}}
 \toprule
-$\tau$ & $\zmax(\tau)$ & Internal Nodes & Leaves Checked & C Time & Unique Surv. & Py Exact Time & Cex \\
+$\tau$ & $\zmax$ & Worker Nodes & Leaves Checked & C Time & Surv. Verified & Stage 2 & Cex \\
 \midrule
 1 & \textbf{1} & 0 & 7 & 0.000s & 0 & 0.000s & \textbf{0} \\
 2 & \textbf{2} & 5 & 40 & 0.000s & 0 & 0.000s & \textbf{0} \\
@@ -182,11 +187,11 @@ $\tau$ & $\zmax(\tau)$ & Internal Nodes & Leaves Checked & C Time & Unique Surv.
 6 & \textbf{5} & 195,403 & 1,724,358 & 0.007s & 349 & 0.135s & \textbf{0} \\
 7 & \textbf{5} & 5,531,334 & 46,799,099 & 0.288s & 15,290 & 0.164s & \textbf{0} \\
 8 & \textbf{6} & 190,402,194 & 1,531,518,439 & 7.202s & 342,991 & 1.693s & \textbf{0} \\
-\textbf{9} & \textbf{6} & \textbf{7,767,648,995} & \textbf{59,308,136,697} & \textbf{399.671s} & \textbf{11,040,213} & \textbf{89.928s} & \textbf{0} \\
-\textbf{10} & \textbf{7} & \textbf{368,616,387,459} & \textbf{2,675,837,421,376} & \textbf{17,449.9s} & \textbf{1,333,049,433}* & \textbf{FLINT} & \textbf{0} \\
+\textbf{9} & \textbf{6} & \textbf{7,767,648,995} & \textbf{59,308,136,697} & \textbf{399.7s} & \textbf{28,755,668}* & \textbf{Py+FLINT} & \textbf{0} \\
+\textbf{10} & \textbf{7} & \textbf{368,616,387,459} & \textbf{2,675,837,421,376} & \textbf{17,450s} & \textbf{1,333,049,433}* & \textbf{FLINT} & \textbf{0} \\
 \bottomrule
 \end{tabular}
-\par\vspace{2pt}{\footnotesize *$\tau=10$ survivor count is per-item exact-deduped across 8,774 work items (18 batches), verified 100\% by \code{python-flint} (19 seven-root survivors, 0 with $\ge 8$ roots; 0 CRT false positives across $68.8\text{B}$ hash hits; full 8,774-item \code{-DALT\_PRIMES} cross-check achieved exact \code{per-item diff == 0}). Internal node counts shown are worker nodes (add $44$ for $\tau=5..7$, $529$ for $\tau=8..9$, $9{,}303$ for $\tau=10$ for split-prefix nodes).}
+\par\vspace{2pt}{\footnotesize *Per-item exact-deduped survivor counts from \code{tau\_certify\_exact.c} ($\tau=9$: $485$ work items, $11{,}040{,}213$ globally unique, verified 100\% by both \code{verify\_survivors.py} and \code{python-flint}; $\tau=10$: $8{,}774$ work items in $18$ batches, verified 100\% by \code{python-flint} with $19$ seven-root survivors and $0$ with $\ge 8$ roots, plus batches $0$--$7$ double-checked by \code{verify\_survivors.py}; full disjoint \code{-DALT\_PRIMES} cross-checks achieved exact \code{per-item diff == 0} at both $\tau=9$ and $\tau=10$). Add $44$ ($\tau=5..7$), $529$ ($\tau=8..9$), and $9{,}303$ ($\tau=10$) split-prefix nodes for total canonical internal nodes.}
 \end{table}
 
 \subsection{Exact Breakdown of the $\tau = 9$ Certification ($K = 6$)}
@@ -239,6 +244,33 @@ Counterexamples with $\ge 7$ integer roots (\code{COUNTEREXAMPLE}) & \textbf{0} 
 \end{tabular}
 \end{table}
 
+\subsection{Exact Breakdown of the $\tau = 10$ Certification ($K = 7$)}
+Extending \code{tau\_certify\_exact.c} to $\tau = 10$ with $K = 7$ across all $8{,}774$ work items (\code{--split 4}, $18$ checkpointed batches of $500$ items, $17{,}449.9\text{s} = 4.85\text{h}$ total C time on $12$ cores) visits $368{,}616{,}396{,}762$ total canonical internal nodes ($9{,}303$ split-prefix nodes plus $368{,}616{,}387{,}459$ worker nodes) and $2{,}675{,}837{,}421{,}376$ canonical leaves ($45.1\times$ larger than $\tau = 9$). Table~\ref{tab:stage1_tau10} reports the exact conservation breakdown. All $58{,}105{,}780{,}935$ duplicate hash hits and $10{,}719{,}150{,}277$ survivor hash hits were exact-CRT confirmed with $0$ false positives, and a full $8{,}774$-item disjoint \code{-DALT\_PRIMES} rerun achieved exact \code{per-item diff == 0}. Verifying all $1{,}333{,}049{,}433$ per-item exact-deduped survivors via \code{audit/flint\_roots.py} (\code{python-flint} exact \code{fmpz\_poly.factor()}) yields the exact root-count distribution $z=0$: $131{,}545{,}405$; $z=1$: $724{,}188{,}908$; $z=2$: $356{,}137{,}666$; $z=3$: $109{,}874{,}319$; $z=4$: $5{,}102{,}526$; $z=5$: $259{,}635$; $z=6$: $7{,}670$; $z=7$: $19$ (plus $5{,}933{,}285$ skipped with exact $\deg \le 7$), and \textbf{$0$ polynomials with $\ge 8$ distinct integer roots}.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Exact-CRT Stage~1 (\code{tau\_certify\_exact.c}) certification breakdown for all $2{,}675{,}837{,}421{,}376$ canonical $10$-gate leaves ($K = 7$, $8{,}774$ work items, $17{,}449.9\text{s}$ C time on $12$ cores, $0$ CRT false positives).}
+\label{tab:stage1_tau10}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Certification Mechanism & Leaves Certified & Share of Total \\
+\midrule
+Exact degree bound (\code{deg\_ub <= 7}) & 1,956,601,429,194 & 73.1211\% \\
+Atomic product-factor union bound (\code{cert\_prod}) & 301,560,591,276 & 11.2698\% \\
+Simple-Root Modular Certificate mod $p_1 = 31$ & 221,045,840,732 & 8.2608\% \\
+Exact Taylor-stripped Certificate mod $p_1 = 31$ & 137,831,162,613 & 5.1510\% \\
+Zero / duplicate gate (\code{cert\_dup\_zero}) & 9,737,432,438 & 0.3639\% \\
+Fallback Simple-Root / Taylor mod $p_2 = 19$ & 28,243,748,808 & 1.0555\% \\
+Fallback Simple-Root / Taylor mod $p_3 = 23$ & 7,799,738,507 & 0.2915\% \\
+Fallback Simple-Root / Taylor mod $p_4 = 29$ & 965,278,098 & 0.0361\% \\
+Passed to exact $\Z[x]$ verifier (\code{survivors\_raw}) & 12,052,199,710 & 0.4504\% \\
+\midrule
+\textbf{Total (exact conservation check)} & \textbf{2,675,837,421,376} & \textbf{100.0000\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Adversarial Audit, Exact-CRT Hardening, and Reproducibility}
 To eliminate hash-collision assumptions and guard against implementation bugs, we subjected the pipeline to a full adversarial audit (\code{audit/PHASE1\_REPORT.md}, \code{audit/BUGS.md}):
 \begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
@@ -257,7 +289,7 @@ To eliminate hash-collision assumptions and guard against implementation bugs, w
 \end{verbatim}
 \end{enumerate}
 
-\section{New Record Witnesses for $\tau = 10 \dots 15$ and Linear Growth}\label{sec:records}
+\section{New Record Witnesses for $\tau = 10 \dots 18$ and Linear Growth}\label{sec:records}
 
 \subsection{Two New Algebraic Gate-Reuse Mechanisms}
 Searching $\tau = 10 \dots 15$ with four complementary engines---structured algebraic family search (\code{tau\_records\_10\_14.py}), $12$-core exhaustive weighted composition search up to $\tau_P = 8$ over $14$ inner polynomials (\code{compose}), $12$-core diverse beam search of width $W = 40{,}000$ (\code{beam}), and seeded exhaustive extension/mutation up to $3.79 \times 10^9$ leaves (\code{extend}, \code{mutate})---uncovered two algebraic mechanisms that break the previous records at $\tau = 12$ and $\tau = 13$.
@@ -422,7 +454,7 @@ Module & LOC & Key Machine-Verified Definitions and Theorems \\
 \end{table}
 
 \begin{remark}[Axiom Audit and Verification Boundary]
-Every theorem in Table~\ref{tab:lean} is verified by Lean~4.36.0's kernel with \code{0 sorryAx} and depends exclusively on the standard mathematical axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$. Concretely, \code{zMaxGe\_of\_evalInt} bridges computable integer evaluation \code{SLP.evalInt} to the noncomputable \code{Polynomial.roots} API, so every witness theorem is discharged cleanly by kernel reduction (\code{decide}). As noted in Section~\ref{sec:census}, the exhaustive $\tau = 9$ upper bound over $5.93 \times 10^{10}$ leaves is certified by our C and exact Python $\Z[x]$ pipeline rather than replayed inside the Lean kernel.
+Every theorem in Table~\ref{tab:lean} is verified by Lean~4.36.0's kernel with \code{0 sorryAx} and depends exclusively on the standard mathematical axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$. Concretely, \code{zMaxGe\_of\_evalInt} bridges computable integer evaluation \code{SLP.evalInt} to the noncomputable \code{Polynomial.roots} API, so every witness theorem is discharged cleanly by kernel reduction (\code{decide}), while \code{Canonical.lean} (\code{zmax9\_le\_six\_of\_checklist}, \code{zmax10\_le\_seven\_of\_checklist}) and \code{CertSoundness.lean} machine-check all canonicalization, dead-gate pruning, and per-leaf certificate rules. Only the raw C enumeration loop execution over $5.93 \times 10^{10}$ ($\tau=9$) and $2.68 \times 10^{12}$ ($\tau=10$) leaves and the external \code{python-flint}/Python $\Z[x]$ verification runs remain outside the Lean kernel.
 \end{remark}
 
 \section{Conclusion and Open Questions}
