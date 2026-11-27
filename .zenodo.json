@@ -1,0 +1,28 @@
+{
+  "title": "shub-smale-tau9: Hardened Exhaustive Certification of z_max(9) = 6, Lean 4 Soundness Formalization, and Record Finite-tau Witnesses for the Shub-Smale tau-Conjecture",
+  "upload_type": "software",
+  "description": "Hardened exact-CRT exhaustive certification of z_max(9) = 6 over all of Z for constant-free straight-line programs (Shub-Smale tau-conjecture / Smale's 4th Problem), extending Santibanez-Leal (2026). Includes an independent naive Rust enumerator (tau <= 7), mutation/canary audit suite, dual exact Z[x] verifiers (pure Python + python-flint), record witnesses up to tau = 18, and a zero-sorry Lean 4.36.0 formalization (8 modules, 4,228 LOC, 204 theorems/lemmas) proving the soundness of all canonicalization, dead-gate pruning, and per-leaf certification rules. AI provenance disclosure: developed with AI assistance (Antigravity Harness + Gemini 4 Neon) and audited via independent adversarial reimplementation and Lean 4 kernel checks.",
+  "creators": [
+    {
+      "name": "0xOsprey"
+    }
+  ],
+  "keywords": [
+    "Shub-Smale tau-conjecture",
+    "Smale's 4th problem",
+    "straight-line programs",
+    "integer roots of polynomials",
+    "Lean 4",
+    "formal verification",
+    "exhaustive search"
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/0xOsprey/shub-smale-tau9",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}

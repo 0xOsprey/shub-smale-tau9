@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: "shub-smale-tau9: Hardened Certification of z_max(9) = 6 and Lean 4 Soundness Formalization for the Shub-Smale tau-Conjecture"
+message: "If you use this software, Lean 4 formalization, or computational census, please cite it as below."
+type: software
+authors:
+  - alias: "0xOsprey"
+repository-code: "https://github.com/0xOsprey/shub-smale-tau9"
+license: MIT
+keywords:
+  - Shub-Smale tau-conjecture
+  - Smale's 4th problem
+  - straight-line programs
+  - Lean 4
+  - formal verification
+abstract: >-
+  Hardened exact-CRT exhaustive certification of z_max(9) = 6 over all of Z for
+  constant-free straight-line programs, extending Santibanez-Leal (2026), with an
+  independent naive Rust cross-check (tau <= 7), mutation suite, dual exact Z[x]
+  verifiers (pure Python and python-flint), record witnesses up to tau = 18, and
+  zero-sorry Lean 4.36.0 soundness proofs for canonicalization and per-leaf
+  certificates. Developed with AI assistance (Antigravity Harness + Gemini 4 Neon).

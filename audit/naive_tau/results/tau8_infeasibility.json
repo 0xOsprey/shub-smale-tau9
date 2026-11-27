@@ -1,0 +1,23 @@
+{
+  "tau": 8,
+  "feasible_under_naive_state_set_algorithm": false,
+  "budgets": {
+    "ram_limit_gb": 20,
+    "wall_limit_hours": 1.5,
+    "cpu_threads": 6
+  },
+  "measured_tau7_inputs": {
+    "L7_size": 469476460,
+    "interned_polys_le_7": 1999762,
+    "tau7_children_from_L6": 2305711488,
+    "tau7_pass_seconds_per_bucket_6threads": 38.4
+  },
+  "bottlenecks": {
+    "L7_storage_ram_gb_deduped": 15.02,
+    "L7_build_peak_ram_gb_estimated": ">32 (sort/dedup buffer of ~1-2B State structs before dedup)",
+    "L8_children_from_L7": 114082779780,
+    "single_pass_time_minutes_estimated_6threads": 32,
+    "multi_bucket_wall_hours_estimated_6threads": ">4 (requires >=8 hash-bucket passes to keep New(8) ~30M polys and interned states within 20GB RAM)"
+  },
+  "conclusion": "Exact naive state-set enumeration of tau=8 (without sign symmetry, operand ordering, or gate-order canonicalization) exceeds both the 20 GB RAM budget (for building/holding L_7) and the 1.5h wall-clock budget (for enumerating ~1.14e11 children across multiple bucket passes)."
+}

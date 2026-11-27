@@ -1,0 +1,11 @@
+HIST 0 2333
+HIST 1 2872
+HIST 2 990
+HIST 3 209
+HIST 4 5
+HIT 4 | 0 -6 11 -6 1 | P 0 -6 11 -6 1
+HIT 4 | 4 0 -5 0 1 | P 4 0 -5 0 1
+HIT 4 | 0 2 -1 -2 1 | P 0 2 -1 -2 1
+HIT 4 | 0 6 11 6 1 | P 0 6 11 6 1
+HIT 4 | 0 -2 -1 2 1 | P 0 -2 -1 2 1
+SUMMARY nonempty=6409 processed=6409 zero=0 skipped_deg_le_K=0 factored=6409 max_z=4 hits=5 K=3

@@ -1,0 +1,5 @@
+HIST 0 256
+HIST 1 315
+HIST 2 125
+HIST 3 20
+SUMMARY nonempty=716 processed=716 zero=0 skipped_deg_le_K=0 factored=716 max_z=3 hits=0 K=3

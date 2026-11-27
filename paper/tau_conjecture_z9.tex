@@ -46,7 +46,7 @@ We close the full unrestricted $\tau = 9$ space unconditionally over all of $\Z$
   \]
   \item \textbf{New record finite-$\tau$ witnesses at $\tau = 11, 12, 13, 15$:} We introduce two new algebraic gate-reuse constructions: the \emph{Midpoint Difference Trick}, yielding a symmetric $8$-root witness at $\tau = 11$ and $9$ distinct integer roots at $\tau = 12$, and \emph{Shifted Pronic-Square Root Quadrupling with Gate Reuse}, yielding $10$ distinct integer roots at $\tau = 13$ (achieving slope $10/13 \approx 0.769 > 2/3$) and $11$ distinct integer roots at $\tau = 15$. We also give a Lean-verified formalization of the classical linear-rate pronic-folding baseline $\zmax(3k) \ge 2k$ for all $k \ge 1$.
   \item \textbf{Further records and exact bounded-multiplication sharpness:} Extending the same gate-reuse ideas gives $\zmax(16) \ge 12$, $\zmax(17) \ge 13$ (\emph{Square-Extraction Trick}) and $\zmax(18) \ge 14$ (\emph{Pronic Self-Shift Identity}). Separately, we show that the trivial degree ceiling is exactly attained: among constant-free SLPs with at most $m$ multiplication gates, the maximum number of distinct integer roots is exactly $2^m$ for $m \in \{0,1,2,3,4\}$, with an explicit $4$-multiplication witness having $16$ distinct integer roots (found by a Diophantine preimage search).
-  \item \textbf{Machine-verified Lean~4.36.0 artifact:} We formalize the SLP model, the Simple-Root Modular Certificate theorem (\code{intRootCount\_le\_of\_eval\_zmod}), all record witnesses up to $\tau = 18$, the $m \le 4$ bounded-multiplication sharpness theorem, and the pronic linear growth theorem across six Lean~4 modules ($1{,}401$ lines total; the full repository audit covers $706$ public theorems in $42$ modules), compiling with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.
+  \item \textbf{Machine-verified Lean~4.36.0 artifact:} We formalize the SLP model, all canonicalization and dead-gate pruning soundness reductions (\code{exists\_canonical}, \code{deadgate\_count\_bound}, \code{zmax9\_le\_six\_of\_checklist}), all per-leaf certificate rules (degree bound, atomic product mask, dual-number modular evaluation, Taylor-stripped modular certificate, and exact CRT zero check), all record witnesses up to $\tau = 18$, the $m \le 4$ bounded-multiplication sharpness theorem, and the pronic linear growth theorem across eight Lean~4 modules ($4{,}228$ lines total, $204$ theorem/lemma declarations), compiling with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.
 \end{enumerate}
 We include a transparent soundness and hash-collision audit delineating exact proof boundaries and full reproducibility commands.
 \end{abstract}
@@ -78,7 +78,7 @@ We settle the $\tau = 9$ frontier unconditionally over all of $\Z$, push the con
   \item \textbf{New record witnesses at $\tau = 12, 13, 15$ and asymptotic linear growth (Section~\ref{sec:records}).}
   We establish new record lower bounds $\zmax(12) \ge 9$ via the \emph{Midpoint Difference Trick}, $\zmax(13) \ge 10$ via \emph{Shifted Pronic-Square Root Quadrupling with Gate Reuse} (achieving root-to-gate ratio $10/13 \approx 0.769 > 2/3$), and $\zmax(15) \ge 11$, alongside a new symmetric $8$-root witness at $\tau = 11$ and a consecutive pronic-$5$ baseline $\zmax(14) \ge 10$. We further prove the unconditional infinite family $\zmax(3k) \ge 2k$ for all $k \ge 1$.
   \item \textbf{Lean~4.36.0 formalization artifact (Section~\ref{sec:lean}).}
-  Six Lean~4 modules (\code{TauConjecture.lean}, \code{TauWitnesses.lean}, \code{ModularRootBound.lean}, \code{TauRecords.lean}, \code{BoundedMult.lean}, and \code{FoldingRecords.lean}; $1{,}401$ lines total) formalize the SLP semantics, foundational degree/multiplication bounds, the Simple-Root Modular Certificate theorem (\code{intRootCount\_le\_of\_eval\_zmod}), every record witness up to $\tau = 18$, exact bounded-multiplication sharpness for $m \le 4$, and the linear lower bound \code{tau\_pronic\_linear\_growth}, with zero \code{sorryAx} and strictly standard axioms.
+  Eight Lean~4 modules (\code{TauConjecture.lean}, \code{TauWitnesses.lean}, \code{ModularRootBound.lean}, \code{TauRecords.lean}, \code{BoundedMult.lean}, \code{FoldingRecords.lean}, \code{Canonical.lean}, and \code{CertSoundness.lean}; $4{,}228$ lines total, $204$ theorem/lemma declarations) formalize the SLP semantics, all canonicalization and dead-gate pruning soundness reductions (\code{exists\_canonical}, \code{deadgate\_count\_bound}, \code{zmax9\_le\_six\_of\_checklist}), all per-leaf certificate rules (degree, product mask, dual-number modular, Taylor-stripped, and CRT exact-zero checks), every record witness up to $\tau = 18$, exact bounded-multiplication sharpness for $m \le 4$, and the linear lower bound \code{tau\_pronic\_linear\_growth}, with zero \code{sorryAx} and strictly standard axioms.
 \end{enumerate}
 
 \section{Mathematical Certification Framework}\label{sec:framework}
@@ -128,7 +128,7 @@ Then $\zZ(f) \le K$ unconditionally over all of $\Z$.
 \end{proposition}
 
 \begin{proof}
-Write $f(x) = \bigl(\prod_{r \in S} (x - r)^{m_r}\bigr) h(x)$ in $\Z[x]$, where $S \subseteq S_0$ is the set of $r_0$ appearing in~(i) and $h(r) \neq 0$ for every $r \in S$. Since $c_{m_r}^{(r)} = h(r) \prod_{r' \in S \setminus \{r\}} (r - r')^{m_{r'}}$ and $p \ge 19 > 6 = \max_{r \neq r' \in S_0} |r - r'|$, the residues of $S_0$ modulo $p$ are pairwise distinct and $\prod_{r' \neq r} (r - r')^{m_{r'}} \not\equiv 0 \pmod p$. Therefore $c_{m_r}^{(r)} \not\equiv 0 \pmod p \iff h(r) \not\equiv 0 \pmod p$. Consequently, no integer root of $h$ can collide modulo $p$ with any $r \in S$, and every other root of $\bar{f}$ in $\F_p$ is simple by~(i). Hence all distinct integer roots of $f$ reduce to pairwise distinct roots of $\bar{f}$ in $\F_p$, giving $\zZ(f) \le \#\{a \in \F_p : \bar{f}(a) = 0\} \le K$.
+For each $r \in S$ (the subset of $S_0$ appearing in~(i)), write $f(x) = (x - r)^{m_r} g_r(x)$ in $\Z[x]$ with $g_r(r) = c_{m_r}^{(r)} \not\equiv 0 \pmod p$. If $s \in \Z$ is any root of $f$ with $s \equiv r \pmod p$ and $s \neq r$, then $g_r(s) = 0$, so $g_r(r) \equiv g_r(s) \equiv 0 \pmod p$, contradicting $c_{m_r}^{(r)} \not\equiv 0 \pmod p$. Hence at most one integer root of $f$ reduces to $r \bmod p$ (namely $r$ itself). Moreover, because $p \ge 19 > 6 = \max_{r \neq r' \in S_0} |r - r'|$, the residues of $S_0$ modulo $p$ are pairwise distinct, and every other root of $\bar{f}$ in $\F_p$ is simple by~(i) (so at most one integer root reduces to it). Combined with $\bar{f} \neq 0$ from~(iii), the reduction map $r \mapsto r \bmod p$ injects $Z_{\Z}(f)$ into $\{a \in \F_p : \bar{f}(a) = 0\}$, giving $\zZ(f) \le \#\{a \in \F_p : \bar{f}(a) = 0\} \le K$. (Machine-checked in \code{CertSoundness.lean}: \code{taylor\_root\_eq\_of\_factor}, \code{intRootCount\_le\_of\_taylor\_zmod}.)
 \end{proof}
 
 \subsection{Degree, Atomic Product-Factor, and Exact $\Z[x]$ Hensel Verification}
@@ -147,14 +147,14 @@ The complete certification pipeline combines four C-level rules with an exact $\
     \item Construct the exact coefficient vector of $f \in \Z[x]$; certify immediately if $f = 0$ (\code{zero}) or if leading-term cancellation reduces $\deg(f) \le K$ (\code{deg}).
     \item Strip any factor $x^e$ ($e \ge 0$) to obtain $f_1(x)$ with $f_1(0) \neq 0$, and compute the exact primitive squarefree part $g = f_1 / \gcd_{\Q[x]}(f_1, f_1')$ using primitive polynomial remainder sequences (PRS) with asserted zero remainder in exact division.
     \item Certify if $\deg(g) + \mathbf{1}_{e > 0} \le K$ (\code{sqf\_deg}), or via Theorem~\ref{thm:modular} on $g \bmod p$ (\code{sqf\_mod}).
-    \item For all remaining survivors, select a good prime $p \nmid \mathrm{lc}(g)$ for which $g \bmod p$ is squarefree, and perform \textbf{exact quadratic Hensel lifting} (\code{hensel\_ok}) of every root of $g \bmod p$ to modulus $p^{2^t} > 2 \cdot \mathrm{CauchyBound}(g)$, where $\mathrm{CauchyBound}(g) = 1 + \max_{i < \deg g} |g_i| / |g_{\deg g}|$. Since every integer root $r$ of $g$ satisfies $|r| < \mathrm{CauchyBound}(g)$ and reduces to a unique root modulo $p^{2^t}$, this recovers $100\%$ of $Z_{\Z}(f)$ exactly.
+    \item For all remaining survivors, select a prime $p \ge 17$ for which $g \bmod p$ is nonzero and has no repeated roots in $\F_p$ (so $g'(a) \not\equiv 0 \pmod p$ for every root $a$ of $g \bmod p$), and perform \textbf{exact quadratic Hensel lifting} (\code{hensel\_ok}) of every simple root of $g \bmod p$ to modulus $p^{2^t} > 2 \cdot \mathrm{CauchyBound}(g) + 1$, where $\mathrm{CauchyBound}(g) = 1 + \max_{i < \deg g} |g_i|$ (valid since $g$ is primitive, so $|g_{\deg g}| \ge 1$). Because every integer root $r$ of $g$ satisfies $|r| < \mathrm{CauchyBound}(g)$ and $g'(r) \equiv g'(r \bmod p) \not\equiv 0 \pmod p$ (even if $p \mid \mathrm{lc}(g)$), Newton lifting uniquely recovers $r \bmod p^{2^t}$ and hence $100\%$ of $Z_{\Z}(f)$ exactly.
   \end{itemize}
 \end{enumerate}
 
 \section{Unconditional $\tau = 9$ Census Over All of $\Z$}\label{sec:census}
 
-\subsection{Provably Lossless Canonicalization Rules}
-To exhaust all constant-free SLPs of length $\tau$ without redundancy, both \code{tau\_parallel.c} and \code{tau\_z9\_unconditional.c} enforce four canonicalization rules, each provably lossless for minimal-length SLPs computing nonzero polynomials over $\Z[x]$:
+\subsection{Machine-Checked Lossless Canonicalization Rules}
+To exhaust all constant-free SLPs of length $\tau$ without redundancy, \code{tau\_certify\_exact.c} (and the original \code{tau\_z9\_unconditional.c}) enforces four canonicalization rules, each formally proved lossless in Lean~4 (\code{Canonical.lean}: \code{exists\_canonical}, \code{deadgate\_count\_bound}, \code{unusedWires\_last\_gate}, \code{zmax9\_le\_six\_of\_checklist}) for minimal-length SLPs computing nonzero polynomials over $\Z[x]$:
 \begin{enumerate}[label=(\alph*),leftmargin=1.8em]
   \item \textbf{Sign canonicalization:} Every gate represents the equivalence class $\{\pm g_k\}$; operations reduce to $+$ ($i \le j$), $-$ ($i < j$), and $\times$ ($i \le j$), while $0$ is strictly redundant.
   \item \textbf{Dead-gate pruning:} At depth $k$, the number $u$ of unused gates among $\{g_1, \dots, g_k\}$ must satisfy $u \le (\tau - k) + 1$; otherwise at least one computed gate can never reach the output wire $g_\tau$.
@@ -188,7 +188,7 @@ $\tau$ & $\zmax(\tau)$ & Internal Nodes & Leaves Checked & C Time & Unique Surv.
 \end{table}
 
 \subsection{Exact Breakdown of the $\tau = 9$ Certification ($K = 6$)}
-At $\tau = 9$, Stage~1 (\code{tau\_z9\_unconditional.c}) visits exactly $7{,}767{,}648{,}995$ canonical internal nodes and $59{,}308{,}136{,}697$ canonical leaves (matching the independent bounded-window enumerator \code{tau\_parallel.c} to the exact integer) in $399.671\text{s}$ ($148.4\text{M}$ leaves/sec across $12$ cores). Table~\ref{tab:stage1} gives the exact conservation breakdown across all certification rules.
+At $\tau = 9$, Stage~1 visits exactly $7{,}767{,}649{,}524$ total canonical internal nodes ($529$ split-prefix nodes in \code{collect\_work} plus $7{,}767{,}648{,}995$ worker internal nodes; note that the original \code{tau\_z9\_unconditional.c} omitted the $529$ prefix nodes from its \code{nodes\_visited} counter, as documented in \code{audit/BUGS.md}) and $59{,}308{,}136{,}697$ canonical leaves. The hardened exact-CRT certifier \code{tau\_certify\_exact.c} reproduces every leaf and certificate counter bit-for-bit in $442.572\text{s}$ on $8$ cores ($384.213\text{s}$ on $12$ cores with \code{-DALT\_PRIMES}). Table~\ref{tab:stage1} gives the exact conservation breakdown across all certification rules.
 
 \begin{table}[ht]
 \centering
@@ -237,23 +237,21 @@ Counterexamples with $\ge 7$ integer roots (\code{COUNTEREXAMPLE}) & \textbf{0} 
 \end{tabular}
 \end{table}
 
-\subsection{Honest Soundness, Collision Audit, and Reproducibility}
-To maintain strict scientific transparency, we audit every assumption in the computational proof:
+\subsection{Adversarial Audit, Exact-CRT Hardening, and Reproducibility}
+To eliminate hash-collision assumptions and guard against implementation bugs, we subjected the pipeline to a full adversarial audit (\code{audit/PHASE1\_REPORT.md}, \code{audit/BUGS.md}):
 \begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
   \item \textbf{Zero root-magnitude assumption:} Every rule in Tables~\ref{tab:stage1} and~\ref{tab:stage2} holds unconditionally over all of $\Z$, including arbitrarily large roots. The Stage~2 verifier passes an automated \code{--self-test} covering polynomials with high-multiplicity roots at $\pm 10^9$ as well as our $10$-gate $7$-root witness (which it flags as a counterexample at $K = 6$).
-  \item \textbf{Hash-based duplicate and survivor deduplication (6-prime cross-checked):}
+  \item \textbf{Deterministic exact-CRT confirmation (zero hash-collision trust):}
   \begin{itemize}[leftmargin=1.5em]
-    \item Internal duplicate/zero gate pruning uses $2$-point evaluation modulo $P_1 = 2^{31}-1$ and $P_2 = 10^9+9$, and raw survivor deduplication uses a $3$-prime polynomial hash modulo $(P_1, P_2, P_3 = 10^9+7)$ ($P_1 P_2 P_3 \approx 2.15 \times 10^{27}$, single-run birthday collision probability $< 10^{-13}$).
-    \item \textbf{Independent second prime-triple cross-check (\code{-DALT\_PRIMES}):} Re-running the entire $\tau = 1 \dots 9$ census ($394.785\text{s}$ at $\tau = 9$, $150.2\text{M leaves/s}$) with a completely disjoint prime triple $(P_1', P_2', P_3') = (2147483629, 1000000021, 1000000033)$ and disjoint evaluation points $(987654321, 123456789, 555555555)$ reproduced all $12$ counters---including all $7{,}767{,}648{,}995$ internal nodes, all $59{,}308{,}136{,}697$ leaves, and all $11{,}040{,}213$ unique survivors---with \textbf{exact zero difference (\code{diff == 0})}. Across the combined $6$-prime modulus $\prod_{i=1}^6 P_i \approx 4.61 \times 10^{54}$, the probability of a simultaneous false collision drops to $< 10^{-40}$.
+    \item In the hardened certifier \code{tau\_certify\_exact.c}, the $2$-prime and $3$-prime hashes act strictly as prefilters. Every hash hit (internal/leaf duplicate or zero check, and survivor deduplication) is confirmed deterministically via multi-point evaluation over $61$-bit primes with combined modulus $Q > 4 \cdot \max |c_k|$ (Lean: \code{poly\_eq\_zero\_of\_crt\_eval}).
+    \item Across all $59{,}308{,}136{,}697$ leaves at $\tau = 9$, all $1{,}432{,}372{,}962$ duplicate hash hits and $207{,}134{,}139$ per-item survivor dedup hits were exact-CRT confirmed with \textbf{$0$ false positives}. Re-running with disjoint \code{-DALT\_PRIMES} reproduced every counter on every one of the $485$ work items (\code{per-item diff == 0}).
+    \item All $28{,}755{,}668$ per-item exact-deduped survivors passed both pure-Python \code{verify\_survivors.py} ($175.4\text{s}$, $0$ counterexamples, \code{accounting\_check=PASS}) and independent \code{python-flint} factorization (\code{audit/flint\_roots.py}: $\max z = 6$, $0$ hits above $6$).
   \end{itemize}
-  As an explicit formal-verification boundary, the exhaustive C/Python search itself is not replayed inside the Lean~4 kernel.
-  \item \textbf{Exact reproducibility commands:}
+  \item \textbf{Independent naive Rust cross-check and mutation suite:} An independent, deliberately naive Rust enumerator (\code{audit/naive\_tau}, no sign symmetry, operand ordering, or gate-order canonicalization; exact \code{i128}/\code{BigInt} arithmetic) independently reproduced $\zmax(1 \dots 7) = (1, 2, 3, 3, 4, 5, 5)$ and matched \code{tau\_certify\_exact}'s exact polynomial set $|\mathrm{New}^\pm(\tau)|$ for every $\tau \le 7$ (all $1{,}092{,}330$ classes at $\tau = 7$: $0$ missing, $0$ extra). Canonical membership testing passed $1{,}000{,}000 / 1{,}000{,}000$ random canonical $\tau = 9$ SLPs and $200{,}000 / 200{,}000$ at $\tau = 10$; all $4$ canaries and all non-equivalent planted bugs were detected (\code{audit/mutation/MUTATION\_REPORT.md}).
+  \item \textbf{Formal verification boundary:} Lean~4.36.0 proves \code{zmax9\_le\_six\_of\_checklist} and every per-leaf certificate rule; only the raw C enumeration loop itself remains outside the Lean kernel. Because leaf-duplicate pruning relies on $\tau' < \tau$, full reproduction runs $\tau = 1 \dots 9$ sequentially:
 \begin{verbatim}
-python3 experiments/pvsnp/tau/verify_z9_all_Z.py --self-test
-clang -O3 -march=native -pthread -o /tmp/tau_z9_unconditional \
-    experiments/pvsnp/tau/tau_z9_unconditional.c
-/tmp/tau_z9_unconditional 9 6 12 /tmp/z9_surv.txt
-python3 experiments/pvsnp/tau/verify_z9_all_Z.py /tmp/z9_surv.txt 6 12
+./reproduce/reproduce.sh quick   # ~3 min: naive tau<=6 cross-check + exact tau<=8
+./reproduce/reproduce.sh tau9    # ~15 min (12 cores): exact tau=1..9 + ALT_PRIMES + verify
 \end{verbatim}
 \end{enumerate}
 
@@ -383,12 +381,12 @@ using the finite-difference identity $(n+1)(n+2) - n(n+1) = 2(n+1)$. Since $x(x-
 
 \section{Lean~4.36.0 Formalization Artifact}\label{sec:lean}
 
-To place the algebraic foundations, the Simple-Root Modular Certificate theorem, the complete witness ladder up to $\tau = 18$, the bounded-multiplication sharpness theorem, and the linear growth theorem beyond human transcription error, we formalized all components in Lean~4.36.0 under \code{Research/PvsNP/Tau/}. Table~\ref{tab:lean} catalogs the six modules ($1{,}401$ lines total).
+To place the algebraic foundations, all canonicalization and dead-gate pruning reductions, every per-leaf certificate rule, the complete witness ladder up to $\tau = 18$, the bounded-multiplication sharpness theorem, and the linear growth theorem beyond human transcription error, we formalized all components in Lean~4.36.0 under \code{Research/PvsNP/Tau/}. Table~\ref{tab:lean} catalogs the eight modules ($4{,}228$ lines total, $204$ theorem/lemma declarations).
 
 \begin{table}[ht]
 \centering
 \small
-\caption{Lean~4.36.0 formalization artifact (\code{Research/PvsNP/Tau/}, $1{,}401$ lines total). All modules compile with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.}
+\caption{Lean~4.36.0 formalization artifact (\code{Research/PvsNP/Tau/}, $8$ modules, $4{,}228$ lines total, $204$ theorems/lemmas). All modules compile with zero \code{sorryAx} and strictly standard axioms $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.}
 \label{tab:lean}
 \begin{tabularx}{\textwidth}{@{}l r X@{}}
 \toprule
@@ -411,6 +409,12 @@ Module & LOC & Key Machine-Verified Definitions and Theorems \\
 \addlinespace[3pt]
 \code{FoldingRecords.lean} & 350 &
 \code{tau\_record\_16\_twelve}, \code{tau\_record\_17\_thirteen}, \code{tau\_record\_18\_fourteen}, \code{slpFourMulSixteen} (exact $\mathrm{mul}=4$), \code{tau\_four\_mul\_sharp} (\code{zMaxMulGe 4 16}), \code{tau\_four\_mul\_intRootCount\_le\_sixteen}, and \code{bounded\_mult\_exact\_sharpness\_four} ($m \le 4$). \\
+\addlinespace[3pt]
+\code{Canonical.lean} & 1,844 &
+\code{GateSpec}, \code{Canonical}, \code{exists\_canonical} (sign-tracking normalization, dead-gate/dup/zero elimination, adjacent-swap lex descent), \code{deadgate\_count\_bound}, \code{unusedWires\_last\_gate}, \code{zmax\_le\_of\_checklist}, \code{zmax9\_le\_six\_of\_checklist}, and \code{zmax10\_le\_seven\_of\_checklist}. \\
+\addlinespace[3pt]
+\code{CertSoundness.lean} & 983 &
+\code{slp\_intRootCount\_le\_degUb}, \code{slp\_intRootCount\_le\_prodMask\_sum}, \code{slp\_evalIn\_dual\_zmod}, \code{slp\_intRootCount\_le\_of\_dual\_eval\_zmod}, \code{taylor\_root\_eq\_of\_factor}, \code{intRootCount\_le\_of\_taylor\_zmod}, \code{slp\_evalPoly\_ne\_of\_evalIn\_ne}, and \code{poly\_eq\_zero\_of\_crt\_eval}. \\
 \bottomrule
 \end{tabularx}
 \end{table}

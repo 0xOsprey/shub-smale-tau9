@@ -1,0 +1,9 @@
+HIST 0 9222
+HIST 1 19650
+HIST 2 8398
+HIST 3 2013
+HIST 4 82
+HIST 5 2
+HIT 5 | 0 0 4 0 -5 0 1 | P 0 0 4 0 -5 0 1
+HIT 5 | 0 4 0 -5 0 1 | P 0 4 0 -5 0 1
+SUMMARY nonempty=39367 processed=39367 zero=0 skipped_deg_le_K=0 factored=39367 max_z=5 hits=2 K=4

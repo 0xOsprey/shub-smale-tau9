@@ -1,0 +1,7 @@
+HIST 0 5
+HIST 1 12
+HIST 2 3
+HIT 2 | 0 1 1 | P 0 1 1
+HIT 2 | 0 -1 1 | P 0 -1 1
+HIT 2 | -1 0 1 | P -1 0 1
+SUMMARY nonempty=20 processed=20 zero=0 skipped_deg_le_K=0 factored=20 max_z=2 hits=3 K=1

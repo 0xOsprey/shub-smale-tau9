@@ -1,0 +1,19 @@
+{
+ "tau":7,
+ "L_size":469476460,
+ "new_polys":1866020,
+ "new_pm_classes":1092330,
+ "excluded_classes_with_smaller_tau_member":24961,
+ "zero_poly_note":"tau(0)=1; 0 is excluded from every count here",
+ "z_max_cumulative":5,
+ "z_max_witness":{"z":5,"poly_coeffs_ascending":"0 -4 0 5 0 -1","slp_compact":"6 a0.0 m1.1 s2.3 m4.4 s3.5 m1.6","slp_gates":6,"first_found_at_level":6},
+ "classes_sent_to_flint":672559,
+ "flint_scope":"classes with degree > 5",
+ "flint_histogram_of_exactly_counted_classes":{"0":183847,"1":325813,"2":131325,"3":30174,"4":1372,"5":28},
+ "degree_histogram_new_pm":[3801,10294,39535,78111,175804,112226,188826,35018,175679,50284,63895,4089,71890,4996,6023,4814,38454,2701,7378,139,6752,158,154,120,6465,167,181,155,181,1,189,1,2953,88,116,1,214,1,1,1,186,1,1,1,1,1,1,0,175,1,1,1,1,0,1,0,1,0,0,0,1,0,0,0,93,1,1,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+ "top_level_unstored":true,
+ "children_enumerated":2305711488,
+ "states_with_new_child":32301757,
+ "states_with_interned_child":437174703,
+ "seconds":156.22
+}

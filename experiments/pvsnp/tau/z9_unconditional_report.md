@@ -1,5 +1,11 @@
 # Unconditional $\mathbb{Z}$-Wide Certification of $z_{\max}(9) = 6$ (Shub–Smale $\tau$-Conjecture)
 
+> **Audit Correction Notice (Nov 2026):** This report preserves the original Wave 2 run of `tau_z9_unconditional.c` / `verify_z9_all_Z.py`. An adversarial audit subsequently identified and logged several inaccuracies in this document (see [`audit/BUGS.md`](../../../audit/BUGS.md) and [`audit/PHASE1_REPORT.md`](../../../audit/PHASE1_REPORT.md)):
+> 1. **Hash-collision probability claims (§Honest Soundness #3)** applied random-point Schwartz–Zippel / uniform-birthday formulas to fixed evaluation points and omitted degree factors. This has been superseded by deterministic **exact multi-point CRT confirmation** in [`tau_certify_exact.c`](tau_certify_exact.c) (`0` false positives across all `1,432,372,962` dup hits and `207,134,139` survivor hits at $\tau = 9$).
+> 2. **Internal-node count (`7,767,648,995`)** omits `44` prefix nodes ($\tau=5..7$) and `529` prefix nodes ($\tau=8..9$) in `collect_work` (true $\tau=9$ total internal nodes = `7,767,649,524`); matching `tau_parallel.c` reflected shared prefix-splitting code rather than independence.
+> 3. **Reproducibility** of $\tau=9$ strictly depends on $\tau=1\dots 8$ at the same $K$ because `cert_dup_zero` prunes leaves duplicating earlier gates; see [`reproduce/reproduce.sh`](../../../reproduce/reproduce.sh).
+> 4. **Canonicalization & certificate soundness** are now formally proved in Lean 4 (`Research/PvsNP/Tau/Canonical.lean` and `CertSoundness.lean`, `0 sorry`), and independently cross-checked against a naive Rust enumerator (`audit/naive_tau`, $\tau \le 7$) and `python-flint`.
+
 ## Executive Summary
 
 We have **unconditionally certified over ALL of $\mathbb{Z}$** (removing the $[-32, 31]$ root-magnitude window assumption from Wave 1) that **no nonzero polynomial computable by a constant-free straight-line program (SLP) of length $\tau \le 9$ over $\{1, x\}$ and $\{+, -, \times\}$ has $\ge 7$ distinct integer roots**:

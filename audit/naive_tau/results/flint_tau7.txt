@@ -1,0 +1,7 @@
+HIST 0 183847
+HIST 1 325813
+HIST 2 131325
+HIST 3 30174
+HIST 4 1372
+HIST 5 28
+SUMMARY nonempty=672559 processed=672559 zero=0 skipped_deg_le_K=0 factored=672559 max_z=5 hits=0 K=5

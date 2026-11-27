@@ -1,0 +1,19 @@
+{
+ "tau":6,
+ "L_size":12008914,
+ "new_polys":122339,
+ "new_pm_classes":74275,
+ "excluded_classes_with_smaller_tau_member":2522,
+ "zero_poly_note":"tau(0)=1; 0 is excluded from every count here",
+ "z_max_cumulative":5,
+ "z_max_witness":{"z":5,"poly_coeffs_ascending":"0 -4 0 5 0 -1","slp_compact":"6 a0.0 m1.1 s2.3 m4.4 s3.5 m1.6","slp_gates":6,"first_found_at_level":6},
+ "classes_sent_to_flint":39367,
+ "flint_scope":"classes with degree > 4",
+ "flint_histogram_of_exactly_counted_classes":{"0":9222,"1":19650,"2":8398,"3":2013,"4":82,"5":2},
+ "degree_histogram_new_pm":[460,1315,6119,9053,17961,7465,11701,1237,10390,1794,2132,69,2399,84,90,86,1442,63,112,1,109,1,1,1,111,1,1,1,1,0,1,0,68,1,1,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+ "top_level_unstored":false,
+ "children_enumerated":0,
+ "states_with_new_child":0,
+ "states_with_interned_child":0,
+ "seconds":1.61
+}

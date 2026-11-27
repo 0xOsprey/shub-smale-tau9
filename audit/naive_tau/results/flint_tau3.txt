@@ -1,0 +1,7 @@
+HIST 0 34
+HIST 1 49
+HIST 2 19
+HIST 3 2
+HIT 3 | 0 -1 0 1 | P 0 -1 0 1
+HIT 3 | 0 0 -1 0 1 | P 0 0 -1 0 1
+SUMMARY nonempty=104 processed=104 zero=0 skipped_deg_le_K=0 factored=104 max_z=3 hits=2 K=2
