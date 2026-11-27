@@ -30,12 +30,13 @@ Executed on 12 CPU cores (Apple M3 Pro) across all **8,774** `--split 4` work it
 | Passed to exact $\mathbb{Z}[x]$ verifier (`survivors_raw`) | 12,052,199,710 | 0.4504% |
 | **Total (exact conservation check)** | **2,675,837,421,376** | **100.0000%** |
 
-### Zero Hash-Collision Trust (Exact Multi-Point CRT Confirmation)
+### Zero Hash-Collision Trust (Exact Multi-Point CRT Confirmation + Disjoint `-DALT_PRIMES` Cross-Check)
 
 Every hash hit was deterministically confirmed via multi-point evaluation over 61-bit primes with combined modulus $Q > 4 \cdot \max |c_k|$ (Lean: `poly_eq_zero_of_crt_eval`):
 - `dup_hash_hits = 58,105,780,935` -> `58,105,780,935` exact-CRT confirmed, **`0` false positives**
 - `zero_hash_hits = 0` -> **`0` false positives**
 - `surv_hash_hits = 10,719,150,277` -> `10,719,150,277` exact-CRT confirmed, **`0` false positives**
+- **Full 8,774-item `-DALT_PRIMES` cross-check (`P1'=2147483629, P2'=1000000021, P3'=1000000033`):** Re-running all 18 batches (all 8,774 work items) with disjoint hash primes and evaluation points reproduced **every single counter on every single one of the 8,774 work items** (`per-item diff == 0`, `0` false positives), including an unintentional real-world power-cycle resume test at item `8,527 / 8,774`!
 
 ### Exact $\mathbb{Z}[x]$ Survivor Verification (`audit/flint_roots.py` + `verify_survivors.py`)
 

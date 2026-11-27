@@ -76,3 +76,4 @@ Expected: 8 modules under `Research/PvsNP/Tau/` (4,228 LOC, 204 theorem/lemma de
 - `audit/flint_roots.py` (all 18 batches, `processed == nonempty == 1,333,049,433`):
   - `HIST z=0: 131,545,405; z=1: 724,188,908; z=2: 356,137,666; z=3: 109,874,319; z=4: 5,102,526; z=5: 259,635; z=6: 7,670; z=7: 19`
   - `skipped_deg_le_7 = 5,933,285`, `factored = 1,327,116,148`, `max_z = 7`, `hits = 0` (`z_max(10) = 7`).
+- `-DALT_PRIMES` full 8,774-item cross-check: `per-item diff == 0` across all 8,774 rows of `done.tsv` (`0` false positives).

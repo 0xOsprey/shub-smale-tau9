@@ -186,7 +186,7 @@ $\tau$ & $\zmax(\tau)$ & Internal Nodes & Leaves Checked & C Time & Unique Surv.
 \textbf{10} & \textbf{7} & \textbf{368,616,387,459} & \textbf{2,675,837,421,376} & \textbf{17,449.9s} & \textbf{1,333,049,433}* & \textbf{FLINT} & \textbf{0} \\
 \bottomrule
 \end{tabular}
-\par\vspace{2pt}{\footnotesize *$\tau=10$ survivor count is per-item exact-deduped across 8,774 work items (18 batches), verified 100\% by \code{python-flint} (19 seven-root survivors, 0 with $\ge 8$ roots; 0 CRT false positives across $68.8\text{B}$ hash hits). Internal node counts shown are worker nodes (add $44$ for $\tau=5..7$, $529$ for $\tau=8..9$, $9{,}303$ for $\tau=10$ for split-prefix nodes).}
+\par\vspace{2pt}{\footnotesize *$\tau=10$ survivor count is per-item exact-deduped across 8,774 work items (18 batches), verified 100\% by \code{python-flint} (19 seven-root survivors, 0 with $\ge 8$ roots; 0 CRT false positives across $68.8\text{B}$ hash hits; full 8,774-item \code{-DALT\_PRIMES} cross-check achieved exact \code{per-item diff == 0}). Internal node counts shown are worker nodes (add $44$ for $\tau=5..7$, $529$ for $\tau=8..9$, $9{,}303$ for $\tau=10$ for split-prefix nodes).}
 \end{table}
 
 \subsection{Exact Breakdown of the $\tau = 9$ Certification ($K = 6$)}

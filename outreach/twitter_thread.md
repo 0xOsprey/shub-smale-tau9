@@ -45,6 +45,7 @@ We formalized the soundness of every canonicalization rule (sign symmetry, dead-
 **Tweet 6/7 (New Exact Result: $z_{\max}(10) = 7$):**
 Running the hardened exact-CRT pipeline on $\tau = 10, K = 7$ (all **2,675,837,421,376** canonical 10-gate SLPs across 8,774 checkpointed work items):
 - 58.1B dup hits + 10.7B survivor hits -> 100% exact-CRT confirmed, **0 false positives**
+- Disjoint `-DALT_PRIMES` rerun across all 8,774 work items: **per-item `diff == 0`**
 - All 1,333,049,433 per-item survivors verified by `python-flint`: **19** exact 7-root polynomials, **0** with $\ge 8$ roots.
 
 Exact sequence: $z_{\max}(1\dots 10) = (1, 2, 3, 3, 4, 5, 5, 6, 6, 7)$, $z_{\max}(11) \ge 8$.
