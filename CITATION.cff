@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "shub-smale-tau9: Hardened Certification of z_max(9) = 6 and Lean 4 Soundness Formalization for the Shub-Smale tau-Conjecture"
+title: "shub-smale-tau9: Hardened Certification of z_max(9) = 6 and z_max(10) = 7 and Lean 4 Soundness Formalization for the Shub-Smale tau-Conjecture"
 message: "If you use this software, Lean 4 formalization, or computational census, please cite it as below."
 type: software
 authors:

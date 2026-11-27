@@ -183,8 +183,10 @@ $\tau$ & $\zmax(\tau)$ & Internal Nodes & Leaves Checked & C Time & Unique Surv.
 7 & \textbf{5} & 5,531,334 & 46,799,099 & 0.288s & 15,290 & 0.164s & \textbf{0} \\
 8 & \textbf{6} & 190,402,194 & 1,531,518,439 & 7.202s & 342,991 & 1.693s & \textbf{0} \\
 \textbf{9} & \textbf{6} & \textbf{7,767,648,995} & \textbf{59,308,136,697} & \textbf{399.671s} & \textbf{11,040,213} & \textbf{89.928s} & \textbf{0} \\
+\textbf{10} & \textbf{7} & \textbf{368,616,387,459} & \textbf{2,675,837,421,376} & \textbf{17,449.9s} & \textbf{1,333,049,433}* & \textbf{FLINT} & \textbf{0} \\
 \bottomrule
 \end{tabular}
+\par\vspace{2pt}{\footnotesize *$\tau=10$ survivor count is per-item exact-deduped across 8,774 work items (18 batches), verified 100\% by \code{python-flint} (19 seven-root survivors, 0 with $\ge 8$ roots; 0 CRT false positives across $68.8\text{B}$ hash hits). Internal node counts shown are worker nodes (add $44$ for $\tau=5..7$, $529$ for $\tau=8..9$, $9{,}303$ for $\tau=10$ for split-prefix nodes).}
 \end{table}
 
 \subsection{Exact Breakdown of the $\tau = 9$ Certification ($K = 6$)}
@@ -424,7 +426,7 @@ Every theorem in Table~\ref{tab:lean} is verified by Lean~4.36.0's kernel with \
 \end{remark}
 
 \section{Conclusion and Open Questions}
-We have unconditionally resolved the $7$-root threshold of the Shub--Smale $\tau$-conjecture over all of $\Z$ ($\zmax(9) = 6$, $\zmax(10) \ge 7$), discovered gate-reuse mechanisms setting new constructive records $\zmax(12) \ge 9$, $\zmax(13) \ge 10$, $\zmax(15) \ge 11$, $\zmax(16) \ge 12$, $\zmax(17) \ge 13$, and $\zmax(18) \ge 14$, showed that the degree ceiling $2^m$ on integer roots is exactly attained for $m \le 4$ multiplication gates, proved $\zmax(3k) \ge 2k$, and formalized the underlying modular certification theorem and witness ladder in Lean~4.36.0. Two immediate frontiers remain open: (i) determining whether $\zmax(10) = 7$ or $8$ (the canonical $10$-gate tree is roughly $40\times$ larger than $\tau = 9$), and (ii) determining whether the gate-reuse slope $10/13 \approx 0.769$ can be sustained asymptotically beyond $2/3$---or whether superlinear growth $\zmax(\tau) = \omega(\tau)$ is achievable.
+We have resolved both the $7$-root and $8$-root thresholds of the Shub--Smale $\tau$-conjecture over all of $\Z$ ($\zmax(9) = 6$, $\zmax(10) = 7$, $\zmax(11) \ge 8$), discovered gate-reuse mechanisms setting new constructive records $\zmax(12) \ge 9$, $\zmax(13) \ge 10$, $\zmax(15) \ge 11$, $\zmax(16) \ge 12$, $\zmax(17) \ge 13$, and $\zmax(18) \ge 14$, showed that the degree ceiling $2^m$ on integer roots is exactly attained for $m \le 4$ multiplication gates, proved $\zmax(3k) \ge 2k$, and formalized the canonicalization soundness, per-leaf certificates, and witness ladder in Lean~4.36.0 (\code{Canonical.lean}, \code{CertSoundness.lean}). Two immediate frontiers remain open: (i) determining whether $\zmax(11) = 8$ or $9$, and (ii) determining whether the gate-reuse slope $10/13 \approx 0.769$ can be sustained asymptotically beyond $2/3$---or whether superlinear growth $\zmax(\tau) = \omega(\tau)$ is achievable.
 
 \begin{thebibliography}{9}
 

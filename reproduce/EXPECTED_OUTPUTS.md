@@ -56,6 +56,23 @@ lake build Research
 
 Expected: 8 modules under `Research/PvsNP/Tau/` (4,228 LOC, 204 theorem/lemma declarations), `0 sorry`, strictly `{propext, Classical.choice, Quot.sound}`.
 
-## 4. $\tau = 10, K = 7$
+## 4. $\tau = 10, K = 7$ (Exact-CRT, 18 Batches / 8,774 Items)
 
-*(Pending completion of the full batched $\tau = 10, K = 7$ run; will be populated upon completion.)*
+- `work_items`: `8,774 / 8,774` (`split = 4`)
+- `prefix_nodes`: `9,303` (`nodes_total = 368,616,396,762`, `nodes_visited = 368,616,387,459`)
+- `leaves_checked`: `2,675,837,421,376` (`conservation_check = PASS`)
+- `cert_deg`: `1,956,601,429,194` (73.12%)
+- `cert_prod`: `301,560,591,276` (11.27%)
+- `cert_p31`: `221,045,840,732` (8.26%)
+- `cert_taylor31`: `137,831,162,613` (5.15%)
+- `cert_dup_zero`: `9,737,432,438` (0.36%)
+- `cert_p19`: `28,243,748,808` (1.0555%)
+- `cert_p23`: `7,799,738,507` (0.2915%)
+- `cert_p29`: `965,278,098` (0.0361%)
+- `survivors_raw`: `12,052,199,710`
+- `survivors_uniq` (per-item deduped): `1,333,049,433`
+- `dup_hash_hits`: `58,105,780,935` (`dup_exact_confirmed = 58,105,780,935`, `dup_false_positive = 0`)
+- `surv_hash_hits`: `10,719,150,277` (`surv_exact_confirmed = 10,719,150,277`, `surv_false_positive = 0`)
+- `audit/flint_roots.py` (all 18 batches, `processed == nonempty == 1,333,049,433`):
+  - `HIST z=0: 131,545,405; z=1: 724,188,908; z=2: 356,137,666; z=3: 109,874,319; z=4: 5,102,526; z=5: 259,635; z=6: 7,670; z=7: 19`
+  - `skipped_deg_le_7 = 5,933,285`, `factored = 1,327,116,148`, `max_z = 7`, `hits = 0` (`z_max(10) = 7`).

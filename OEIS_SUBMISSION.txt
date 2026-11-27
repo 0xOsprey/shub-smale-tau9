@@ -2,14 +2,14 @@
 # Submit at: https://oeis.org/Submit.html
 
 %N Maximum number of distinct integer roots of a nonzero univariate polynomial in Z[x] computable by a constant-free straight-line program (SLP) of length at most n.
-%S 1,2,3,3,4,5,5,6,6
+%S 1,2,3,3,4,5,5,6,6,7
 %O 1,2
 %C A constant-free straight-line program (SLP) of length n starts from g_{-1} = 1 and g_0 = x, and for k = 1..n computes g_k = g_i op g_j with op in {+, -, *} and -1 <= i, j < k.
 %C a(n) is the maximum number of distinct integer roots of any nonzero polynomial f in Z[x] computable in at most n gates.
 %C The Shub-Smale tau-conjecture (Smale's 4th Problem) asks whether a(n) is bounded above by a polynomial in n; an affirmative answer implies P_C != NP_C in the Blum-Shub-Smale model.
 %C Exact values for n = 1..8 were established by Felipe Santibanez-Leal (August 2026), who also established a(10) >= 7 and ruled out 9-gate SLPs ending in a multiplication gate.
-%C Exact value a(9) = 6 was established unconditionally over all of Z (closing additive and subtractive final gates across all 59,308,136,697 canonical 9-gate SLPs) in November 2026, proving that the minimum length for 7 distinct integer roots is 10.
-%C Known lower bounds for n >= 10 (all machine-verified in Lean 4): a(10) >= 7, a(11) >= 8, a(12) >= 9, a(13) >= 10, a(14) >= 10, a(15) >= 11.
+%C Exact value a(9) = 6 (59,308,136,697 canonical 9-gate SLPs) and a(10) = 7 (2,675,837,421,376 canonical 10-gate SLPs) were established unconditionally over all of Z via exact-CRT certification, python-flint / Python Z[x] verification, and Lean 4 soundness proofs in November 2026, proving that the minimum length for 7 distinct integer roots is 10 and for 8 distinct integer roots is 11.
+%C Known lower bounds for n >= 11 (all machine-verified in Lean 4): a(11) >= 8, a(12) >= 9, a(13) >= 10, a(14) >= 10, a(15) >= 11, a(16) >= 12, a(17) >= 13, a(18) >= 14.
 %C Asymptotically, a(3*k) >= 2*k for all k >= 1 via pronic folding prod_{j=0}^{k-1} (x*(x-1) - j*(j+1)).
 %e a(1) = 1: x - 1 (root 1).
 %e a(2) = 2: x*(x - 1) (roots 0, 1).
@@ -17,8 +17,9 @@
 %e a(5) = 4: q*(q - 2) where q = x^2 - x (roots -1, 0, 1, 2).
 %e a(6) = 5: x*(x^2 - (2 - x^2)^2) = -x*(x^2 - 1)*(x^2 - 4) (roots -2, -1, 0, 1, 2).
 %e a(8) = 6: q*(q - 2)*(q - 6) where q = x^2 - x (roots -2, -1, 0, 1, 2, 3).
-%e a(9) = 6: exhaustive unconditional certification over all 59,308,136,697 canonical 9-gate SLPs finds no nonzero polynomial with >= 7 distinct integer roots in Z.
-%H GitHub repository, <a href="https://github.com/0xOsprey/shub-smale-tau9">shub-smale-tau9: Unconditional z_max(9) = 6, Record Witnesses up to tau = 15, and Lean 4 Certification</a>, 2026.
+%e a(9) = 6: exhaustive exact-CRT certification over all 59,308,136,697 canonical 9-gate SLPs finds no nonzero polynomial with >= 7 distinct integer roots in Z.
+%e a(10) = 7: -x*(x^2 - 1)*(x^2 - 4)*(x^2 - 9) (roots -3..3); exhaustive exact-CRT certification over all 2,675,837,421,376 canonical 10-gate SLPs finds 19 exact 7-root survivors and 0 with >= 8 distinct integer roots in Z.
+%H GitHub repository, <a href="https://github.com/0xOsprey/shub-smale-tau9">shub-smale-tau9: Hardened z_max(9) = 6, z_max(10) = 7, Record Witnesses up to tau = 18, and Lean 4 Soundness Proofs</a>, 2026.
 %H M. Shub and S. Smale, <a href="https://doi.org/10.1215/S0012-7094-95-08105-8">On the intractability of Hilbert's Nullstellensatz and an algebraic version of "NP != P?"</a>, Duke Math. J. 81 (1995), 47-54.
 %H S. Smale, <a href="https://doi.org/10.1007/BF03025291">Mathematical problems for the next century</a>, Math. Intelligencer 20 (1998), 7-15.
 %H F. Santibanez-Leal, The bottom of the Shub-Smale tau conjecture: an exact census of integer roots for constant-free straight-line programs of length at most eight, Zenodo preprint, August 2026.
