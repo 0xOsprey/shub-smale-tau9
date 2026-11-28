@@ -11,3 +11,5 @@ public import Research.PvsNP.Tau.CertSoundness
 public import Research.PvsNP.Tau.ChirpZ
 public import Research.PvsNP.Tau.SubquadraticRefutation
 public import Research.PvsNP.Tau.PadicBarrier
+public import Research.PvsNP.Tau.RealLowerBound
+public import Research.PvsNP.Tau.UniformPadicBarrier

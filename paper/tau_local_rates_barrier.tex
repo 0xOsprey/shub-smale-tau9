@@ -1,0 +1,207 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\zmax}{z_{\max}}
+
+\title{Local Exponential Growth Rates for Smale's 4th Problem: Beating Chebyshev Over $\R$, Cubic Branching Over $\Z_2$, and a Uniform $p$-Adic Barrier $\lim_{p \to \infty} \alpha_{\Q_p} = 1$ (with Lean~4 Formalization)}
+
+\author{0xOsprey}
+
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $\zmax^K(\tau)$ denote the maximum number of distinct roots in a field or ring $K$ of a nonzero univariate polynomial $f \in \Z[x]$ computable by a constant-free, division-free straight-line program (SLP) of length $\tau$ over $\{+, -, \times\}$ starting from $\{1, x\}$, and define the asymptotic exponential growth rate $\alpha_K := \limsup_{\tau \to \infty} \frac{\log_2 \zmax^K(\tau)}{\tau} \in [0, 1]$. For Smale's 4th Problem (\code{IIS-O-1205}, the Shub--Smale $\tau$-conjecture over $K = \Z$), the best known upper bounds remain of the form $2^{(1-o(1))\tau}$ (Rojas 2002/2003 over $\Q_2$; our companion paper \code{iis:2611.00175} over $\R$), and establishing any exponential-base improvement $\zmax(\tau) \le 2^{(1-\varepsilon)\tau}$ ($\varepsilon > 0$) is a major open milestone.
+
+We establish three unconditional local exponential lower bounds---all completely machine-verified in Lean~4.36.0 ($1{,}846$ lines across two new modules, $37$ theorems, zero \code{sorryAx}, zero \code{native\_decide}, strictly $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$):
+\begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
+  \item \textbf{Uniform $p$-Adic Barrier ($\lim_{p \to \infty} \alpha_{\Q_p} = 1$; Lean~4: \code{tau\_padic\_fermat}, \code{tau\_padic\_rate\_}\allowbreak\code{arbitrarily\_close\_to\_one}):} For every odd prime $p$, the polynomial $Q_p(x) := x^2((px)^{p-1} - 1) \in \Z[x]$ maps each of the $p - 1$ disjoint balls $\frac{r + p\Z_p}{p} \subset \Q_p \setminus \Z_p$ ($1 \le r < p$) bijectively onto $\frac{1}{p}\Z_p$, yielding $(p - 1)^k$ distinct simple roots of $Q_p^{\circ k}(x)$ in $\Q_p$. For Fermat primes $p = 2^m + 1$, this requires $(m + 3)k + (m + 3)$ gates, giving $\alpha_{\Q_{2^m+1}} \ge \frac{m}{m+3}$ (e.g., $\alpha_{\Q_{65537}} \ge \frac{16}{19} \approx 0.8421$). Via base-$2^w$ windowed addition chains, $\lim_{p \to \infty} \alpha_{\Q_p} = 1$. Consequently, \emph{no proof uniform in $p$ can establish $z_{\Q_p}(f) \le 2^{(1-\varepsilon)\tau(f)}$ for any $\varepsilon > 0$}: any proof breaking $2^{(1-o(1))\tau}$ must rely on a fixed small prime (such as $p = 2$), on $\R$, or on a genuinely global arithmetic mechanism.
+  \item \textbf{Beating Chebyshev Over $\R$ (Lean~4: \code{tau\_real\_5C}, \code{tau\_real\_5C\_beats\_chebyshev}):} The constant-free $5$-gate-per-step family \code{5C} given by $u(y) = y(4-y)$, $Q_{\mathrm{5C}}(y) = (u(y)(u(y)-3))^2$, $f_k(x) = Q_{\mathrm{5C}}^{\circ k}(x) - 1$ has length $\tau(f_k) = 5k + 4$ and at least $8 \cdot 7^{k-1}$ distinct real roots (proved elementarily via an explicit nested-radical $1$D $7$-branch horseshoe on $(0, 5)$), strictly dominating Chebyshev's $2^{\lfloor \tau/2 \rfloor}$ for all $k \ge 5$ and improving the unconditional real-root rate from $\alpha_{\R} \ge 0.50$ ($1.4142^\tau$) to $\alpha_{\R} \ge \frac{\log_2 7}{5} \approx 0.56147$ ($1.4758^\tau$). Exhaustive search over all $238$ connected $g = 5$ and $2{,}767$ connected $g = 6$ autonomous DAG topologies confirms $7^{1/5}$ is optimal through $g = 6$.
+  \item \textbf{Cubic Branching Over $\Z_2$ (Lean~4: \code{tau\_padic2\_cubic}):} The homogenized recurrence $P_0 = x$, $D_0 = 1$, $P_{n+1} = P_n(P_n^2 - D_n^2)$, $D_{n+1} = 8 D_n^3$ has constant-free length $\tau(P_k) = 6k - 2$ ($k \ge 2$) and at least $3^k$ distinct roots in $\Z_2$, improving \code{iis:2611.00175}'s bound $\alpha_{\Z_2} \ge 0.25$ to $\alpha_{\Z_2} \ge \frac{\log_2 3}{6} \approx 0.26416$.
+\end{enumerate}
+We also record an analytic $2$-adic obstruction study: under tropical nonsingularity and mod-$2$ $0$-dimensionality, a Quadratic Mod-$2$ Reduction Lemma and complete Nakayama over the Tate algebra $T_r^\circ$ yield a single-exponential bound $\frac{1}{6} 12^a$, but a Hensel Scale Dichotomy refutes generic perturbation and valued-extension deformation as ways to bypass mod-$2$ degeneracy. This work does \textbf{not} resolve $\zmax(\tau) \le 2^{(1-\varepsilon)\tau}$, the full Shub--Smale $\tau$-conjecture ($c \ge 2$), or $\mathrm{P}$ vs $\mathrm{NP}$; it was developed with AI assistance (Antigravity Harness + Gemini 4 Neon) and machine-verified in Lean~4.36.0.
+\end{abstract}
+
+\section{Introduction and Updated Local-Rate Landscape}
+
+Smale's 4th Problem~\cite{ShubSmale1995} (\code{IIS-O-1205}) asks whether $\zmax^{\Z}(\tau) = O(\tau^c)$ for some universal constant $c \ge 1$. In our companion papers~\code{iis:2611.00113} and~\code{iis:2611.00175}, we determined exact finite-$\tau$ values $\zmax^{\Z}(1 \dots 10) = (1,2,3,3,4,5,5,6,6,7)$, unconditionally refuted every real sub-quadratic exponent $c < 2$ in Lean~4 ($\zmax^{\Z}(\tau) = \Omega(\tau^2/(\log^2 \tau (\log\log \tau)^2))$, concrete crossover $\zmax^{\Z}(1884) \ge 2049$), proved an unconditional full-DAG real-root upper bound $\zmax^{\R}(\tau) \le 2^{\tau - (\sqrt{2}-o(1))\sqrt{\tau}}$, and proved a $2$-adic lower bound $\zmax^{\Z_2}(4k) \ge 2^k$.
+
+Even before approaching a subexponential bound $2^{o(\tau)}$, a striking open threshold on \code{IIS-O-1205} is whether $\alpha_{\Z} < 1$---that is, whether there exists \emph{any} absolute constant $\varepsilon > 0$ such that $\zmax^{\Z}(\tau) \le 2^{(1-\varepsilon)\tau}$. Both Rojas's $2$-adic bound $2^{\tau - (1-o(1))\tau/\log_2\tau}$~\cite{Rojas2002,Rojas2003} and our real-root DAG bound $2^{\tau - (\sqrt{2}-o(1))\sqrt{\tau}}$ remain $2^{(1-o(1))\tau}$.
+
+This paper maps the exact local exponential growth rates
+\[
+  \alpha_K \;:=\; \limsup_{\tau \to \infty} \frac{\log_2 \zmax^K(\tau)}{\tau} \;\in\; [0, 1]
+\]
+across local completions $K$, establishing three new Lean-verified lower bounds and sharply constraining which proof strategies can hope to prove $\alpha_{\Z} < 1$:
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{lXXX}
+\toprule
+Domain $K$ & Best Known Lower Bound on $\alpha_K$ & Best Known Upper Bound & Status \\
+\midrule
+$\C$, $\F_p$ (varying $p$) & $1$ ($x^{2^{\tau-1}} - 1$) & $2^\tau$ ($\alpha = 1$) & Exact \\
+$\Q_p$ (varying $p$) & \textbf{$1$ (Thm.~\ref{thm:uniform-padic}: $\lim_{p \to \infty} \alpha_{\Q_p} = 1$)} & $2^\tau$ ($\sup_p \alpha_{\Q_p} = 1$) & \textbf{NEW Exact (Lean 4)} \\
+$\R$ & \textbf{$\frac{\log_2 7}{5} \approx 0.56147$ (Thm.~\ref{thm:real-5c}, \code{5C})} & $2^{\tau - (\sqrt{2}-o(1))\sqrt{\tau}}$ & \textbf{NEW (Lean 4)} \\
+$\Q_2$ / $\Z_2$ & \textbf{$\frac{\log_2 3}{6} \approx 0.26416$ (Thm.~\ref{thm:cubic-z2})} & $2^{\tau - (1-o(1))\tau/\log_2\tau}$ & \textbf{NEW (Lean 4)};~\cite{Rojas2002,Rojas2003} \\
+$\Z$ (\code{IIS-O-1205}) & $0$ ($\Omega(\tau^2/(\log^2\tau(\log\log\tau)^2))$) & $2^{\tau - (1-o(1))\tau/\log_2\tau}$ & \code{iis:2611.00175};~\cite{Rojas2002,Rojas2003} \\
+\bottomrule
+\end{tabularx}
+\caption{Updated landscape of exponential root-count rates $\alpha_K = \limsup_{\tau \to \infty} (\log_2 \zmax^K(\tau))/\tau$ for constant-free $\Z[x]$ SLPs.}
+\label{tab:landscape}
+\end{table}
+
+\section{Uniform $p$-Adic Barrier: $\lim_{p \to \infty} \alpha_{\Q_p} = 1$}
+
+Every polynomial $Q \in \Z[x]$ is $1$-Lipschitz on the $p$-adic integers $\Z_p$, so no fixed $Q \in \Z[x]$ can expand $p$-adic disks inside $\Z_p$ without a growing scale factor $D_n$. Over the full field $\Q_p$, however, cancellation between terms on $\frac{1}{p}\Z_p^\times \subset \Q_p \setminus \Z_p$ yields expansion factor $|Q_p'(x)|_p = p > 1$ with zero denominator overhead.
+
+\begin{theorem}[Uniform $p$-Adic Barrier; Lean~4: \code{tau\_padic\_fermat}, \code{tau\_padic\_rate\_}\allowbreak\code{arbitrarily\_close\_to\_one}]
+\label{thm:uniform-padic}
+For every odd prime $p$, define $Q_p(x) := x^2((px)^{p-1} - 1) \in \Z[x]$ and let $Q_p^{\circ k} \in \Z[x]$ be its $k$-fold iterate ($k \ge 1$). Then $Q_p^{\circ k} \neq 0$ and $Q_p^{\circ k}$ has at least $(p - 1)^k$ distinct simple roots in $\Q_p$. Moreover:
+\begin{enumerate}[label=(\alph*),leftmargin=1.8em]
+  \item For every Fermat prime $p = 2^m + 1$ ($m \ge 1$), $\tau(Q_p^{\circ k}) \le (m + 3)k + (m + 3)$, giving
+  \[
+    \alpha_{\Q_{2^m+1}} \;\ge\; \frac{m}{m + 3} \qquad \left(\alpha_{\Q_5} \ge \frac{2}{5},\;\; \alpha_{\Q_{17}} \ge \frac{4}{7},\;\; \alpha_{\Q_{257}} \ge \frac{8}{11},\;\; \alpha_{\Q_{65537}} \ge \frac{16}{19} \approx 0.8421\right).
+  \]
+  \item For every $\varepsilon > 0$, there exist an odd prime $p$ and integers $\tau_{\mathrm{step}} > 0$, $C \ge 0$ such that for all $k \ge 1$, $\tau(Q_p^{\circ k}) \le \tau_{\mathrm{step}} k + C$ while $\frac{\log_2(p - 1)}{\tau_{\mathrm{step}}} > 1 - \varepsilon$. Hence
+  \[
+    \lim_{p \to \infty} \alpha_{\Q_p} \;=\; 1.
+  \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+For each $r \in \{1, \dots, p-1\}$, let $B_r := \frac{r + p\Z_p}{p} \subset \frac{1}{p}\Z_p$. By Fermat's Little Theorem, $r^{p-1} - 1 = p c_r$ for some $c_r \in \Z$, so in $\Z_p[v]$ the polynomial
+\[
+  H_r(v) := c_r + \sum_{j=1}^{p-1} \binom{p-1}{j} r^{p-1-j} p^{j-1} v^j
+\]
+satisfies $p H_r(v) = (r + pv)^{p-1} - 1$. For any $w \in \Z_p$, consider $G_r(v) := (r + pv)^2 H_r(v) - w \in \Z_p[v]$. Modulo $p$,
+\[
+  G_r(v) \equiv r^2 c_r - r v - w \pmod p, \qquad G_r'(v) \equiv -r \not\equiv 0 \pmod p.
+\]
+Since $r \in \Z_p^\times$, setting $a := r^{-1}(r^2 c_r - w) \in \Z_p$ gives $|G_r(a)|_p \le p^{-1} < 1 = |G_r'(a)|_p^2$. By Hensel's lemma, there exists $v \in \Z_p$ with $G_r(v) = 0$, hence $(r+pv)^2((r+pv)^{p-1} - 1) = p w$ in $\Z_p$. Setting $x := \frac{r + pv}{p} \in B_r$ gives $Q_p(x) = \frac{w}{p}$. Since $p B_{r_1} \cap p B_{r_2} = \emptyset$ for $1 \le r_1 < r_2 < p$, induction on $k$ produces $(p - 1)^k$ distinct solutions in $\Q_p$ to $Q_p^{\circ k}(x) = w / p$; setting $w = 0$ yields $(p - 1)^k$ distinct roots of $Q_p^{\circ k}$. Nonzero leading coefficient $p^{(p-1)\frac{(p+1)^k-1}{p}} > 0$ gives $Q_p^{\circ k} \neq 0$.
+
+For SLP length, note that $(pw)^{p-1} = (p^2 w^2)^{(p-1)/2}$. Precomputing $p^2$ once takes $m + 2$ gates for $p = 2^m + 1$ (or $2\lfloor \log_2 p \rfloor + 3$ gates for general $p$). Each iteration computes $s = w^2$, $t = p^2 s$, $z = t^{(p-1)/2}$, $d = z - 1$, $w' = s d$, costing $4$ gates plus the exponentiation cost for $t^{(p-1)/2}$. For $p = 2^m + 1$, $(p-1)/2 = 2^{m-1}$ takes $m - 1$ squarings, totaling $m + 3$ gates per step (plus $1$ extraction gate in the compositional \code{CanBuild} proof). For general odd primes $p$, base-$2^w$ windowed exponentiation (\code{canBuild\_pow\_window}) precomputes $\{t^j : j < 2^w\}$ in $2^w$ gates and processes $\lfloor \log_2 p / w \rfloor$ windows of $w$ squarings plus $1$ multiplication, totaling $\tau_{\mathrm{step}} = 2^w + (w+1)\lfloor \log_2 p / w \rfloor + 4 \le (1 + 1/w)\log_2 p + 2^w + 4$. Choosing $w > 3/\varepsilon$ and a prime $p \ge 2^M$ with $M > (2^w + 6)(3/\varepsilon) + 4$ gives $\frac{\log_2(p-1)}{\tau_{\mathrm{step}}} > 1 - \varepsilon$.
+\end{proof}
+
+\begin{corollary}[Uniform $p$-Adic Barrier Against $2^{(1-\varepsilon)\tau}$]
+No theorem that holds uniformly across primes $p$ can establish $z_{\Q_p}(f) \le 2^{(1-\varepsilon)\tau(f)}$ for any constant $\varepsilon > 0$. Any local $p$-adic approach to proving $\alpha_{\Z} < 1$ must exploit arithmetic specific to a fixed small prime (such as $p = 2$).
+\end{corollary}
+
+\section{Beating Chebyshev Over $\R$: The 5-Gate Family \code{5C}}
+
+Classical Chebyshev polynomials $y_{n+1} = y_n^2 - 2$ use $2$ gates per doubling and achieve $\zmax^{\R}(\tau) \ge 2^{\lfloor(\tau-1)/2\rfloor}$ ($\alpha_{\R} \ge 0.50$, base $\sqrt{2} \approx 1.4142$). We improve this unconditionally using a 5-gate constant-free family whose proof requires only nested square roots (no calculus or $2 \times 2$ Markov matrix).
+
+\begin{theorem}[Real-Root Lower Bound Beating Chebyshev; Lean~4: \code{tau\_real\_5C}, \code{tau\_real\_5C\_}\allowbreak\code{beats\_chebyshev}]
+\label{thm:real-5c}
+Define $u(y) := y(4 - y)$, $Q_{\mathrm{5C}}(y) := (u(y)(u(y) - 3))^2 \in \Z[y]$, and $f_k(x) := Q_{\mathrm{5C}}^{\circ k}(x) - 1 \in \Z[x]$. Then for every $k \ge 1$:
+\begin{enumerate}[label=(\alph*),leftmargin=1.8em]
+  \item $f_k \neq 0$ and $\tau(f_k) \le 5k + 4$;
+  \item $f_k$ has at least $8 \cdot 7^{k-1}$ distinct real roots, strictly exceeding $2^{\lfloor(5k+4)/2\rfloor}$ for all $k \ge 5$;
+  \item consequently, $\alpha_{\R} \ge \frac{\log_2 7}{5} \approx 0.561471 > 0.50$ (base $7^{1/5} \approx 1.475773 > \sqrt{2}$).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Precompute $c_2 = 1+1$, $c_3 = c_2 + 1$, $c_4 = c_2 + c_2$ ($3$ gates). Each step computes $a_i = c_4 - w_i$, $u_i = w_i a_i$, $b_i = u_i - c_3$, $v_i = u_i b_i$, $w_{i+1} = v_i^2$ ($5$ gates), and the final gate computes $f_k = w_k - 1$, giving $\tau(f_k) \le 5k + 4$. Since $Q_{\mathrm{5C}}(0) = 0$, $f_k(0) = -1 \neq 0$, so $f_k \neq 0$.
+
+For any $t \in (0, 5)$, let $s := \sqrt{t} \in (0, \sqrt{5}) \subset (0, 9/4)$. Then $9 - 4s > 0$ and $9 < 9 + 4s < 18 < 25$, so $d_1 := \sqrt{9 - 4s} \in (0, 3)$ and $d_2 := \sqrt{9 + 4s} \in (3, 5)$. The four values
+\[
+  u_4 := \frac{3 - d_2}{2} < 0 < u_1 := \frac{3 - d_1}{2} < u_2 := \frac{3 + d_1}{2} < u_3 := \frac{3 + d_2}{2} < 4
+\]
+satisfy $-1 < u_4$, $u_1(u_1 - 3) = u_2(u_2 - 3) = -s$, and $u_3(u_3 - 3) = u_4(u_4 - 3) = +s$. Defining $r_j := \sqrt{4 - u_j}$ gives $0 < r_3 < r_2 < r_1 < 2 < r_4 < 3$, so the eight preimages $2 \pm r_j$ of $Q_{\mathrm{5C}}(y) = t$ form a single strictly increasing chain:
+\[
+  2 - r_4 \;<\; 0 \;<\; 2 - r_1 \;<\; 2 - r_2 \;<\; 2 - r_3 \;<\; 2 + r_3 \;<\; 2 + r_2 \;<\; 2 + r_1 \;<\; 2 + r_4 \;<\; 5.
+\]
+Hence every $t \in (0, 5)$ has $7$ distinct preimages in $(0, 5)$ and $8$ distinct preimages in $\R$. Starting from $t = 1 \in (0, 5)$, $k - 1$ iterations produce $7^{k-1}$ distinct points in $(0, 5)$, and one final $8$-branch step produces $8 \cdot 7^{k-1}$ distinct real roots of $f_k$. For $k \ge 5$, direct check at $k = 5, 6$ ($19{,}208 > 16{,}384$ and $134{,}456 > 131{,}072$) and $7^2 = 49 > 32 = 2^5$ yield $8 \cdot 7^{k-1} > 2^{\lfloor(5k+4)/2\rfloor}$ by induction.
+\end{proof}
+
+\begin{remark}[Exhaustive $g = 5, 6$ Autonomous DAG Optimality]
+To beat $7^{1/5}$ at $g = 6$ gates per step requires spectral radius $\rho > 7^{6/5} \approx 10.33$, hence $\deg(Q) \ge 11$, restricting candidate autonomous DAGs to $(a = 2, m = 4)$. Exhaustive enumeration of all $238$ connected $g = 5$ ($\deg \ge 8$) and all $2{,}767$ connected $g = 6$ ($\deg \ge 11$) topologies (verified via artifact-free preimage trees) yields $\max \rho = 7$ at $g = 5$ (achieved by \code{5C} and two conjugate families including $u(4-u)$ with $u = y^2(y-3)^2$) and $\max \rho = 9$ at $g = 6$ ($9^{1/6} \approx 1.44225 < 7^{1/5}$).
+\end{remark}
+
+\section{Cubic Branching Over $\Z_2$: Beating $2^{\tau/4}$}
+
+In~\code{iis:2611.00175} (Theorem~5), iterating $P_{n+1} = P_n^2 - c_{n+1}$ yielded $\zmax^{\Z_2}(4k) \ge 2^k$ ($\alpha_{\Z_2} \ge 0.25$). Homogenizing the cubic map $y \mapsto y(y^2 - 1)$ improves the rate inside $\Z_2$.
+
+\begin{theorem}[Cubic $\Z_2$ Lower Bound; Lean~4: \code{tau\_padic2\_cubic}]
+\label{thm:cubic-z2}
+Define $P_0(x) = x$, $D_0 = 1$, $P_{n+1}(x) := P_n(x)(P_n(x)^2 - D_n^2)$, and $D_{n+1} := 8 D_n^3$. For every $k \ge 2$, $P_k \in \Z[x]$ is monic of degree $3^k$, satisfies $\tau(P_k) \le 6k - 2$, and admits at least $3^k$ distinct roots in $\Z_2$. Hence
+\[
+  \alpha_{\Q_2} \;\ge\; \alpha_{\Z_2} \;\ge\; \frac{\log_2 3}{6} \;\approx\; 0.264160 \;>\; \frac{1}{4}.
+\]
+\end{theorem}
+
+\begin{proof}
+Precomputing $8$ ($3$ gates) and $P_1 = x(x^2 - 1)$ ($3$ gates, with $D_1 = 8$), each intermediate step $n \in \{1, \dots, k-2\}$ uses $6$ gates ($P_n^2, D_n^2, P_n^2 - D_n^2, D_n^3, 8 D_n^3, P_n(P_n^2 - D_n^2)$), and the final step omits $D_k$ ($4$ gates), giving $3 + 3 + 6(k-2) + 4 = 6k - 2$.
+
+For any $t \in \Z_2$, consider $F(y) := y^3 - y - 8t \in \Z_2[y]$ with $F'(y) = 3y^2 - 1$. Evaluating at $a \in \{0, 1, -1\}$ gives $|F(a)|_2 = |-8t|_2 \le 1/8$, while $|F'(0)|_2 = 1$ and $|F'(\pm 1)|_2 = |2|_2 = 1/2$. In all three cases $|F(a)|_2 \le 1/8 < |F'(a)|_2^2$, so Hensel's lemma yields roots $y_1, y_2, y_3 \in \Z_2$ satisfying $|y_1|_2 < 1$, $|y_2 - 1|_2 < 1/2$, and $|y_3 + 1|_2 < 1/2$. By the ultrametric triangle inequality, $y_1, y_2, y_3$ are pairwise distinct. Writing $y = P_n(x)/D_n$, induction on $n$ shows $P_n(x) = D_n t$ has at least $3^n$ distinct roots in $\Z_2$; setting $t = 0$ yields $3^k$ distinct roots of $P_k$.
+\end{proof}
+
+\section{Obstruction Analysis for Breaking $2^{(1-o(1))\tau}$ at $p = 2$}
+
+Theorem~\ref{thm:uniform-padic} shows that any local $p$-adic route to $\zmax(\tau) \le 2^{(1-\varepsilon)\tau}$ must be specific to a fixed small prime such as $p = 2$. To beat $2^{(1-o(1))\tau}$ over $\Q_2$, it would suffice to show $z_{\Q_2}(f) \le C^a$ for an SLP with $a$ additions (improving Rojas's $C^a a!$~\cite{Rojas2002,Rojas2003} to remove the $a!$ factor) and balance against $\deg(f) \le 2^{\tau - a}$ at $a = \delta \tau$.
+
+We record both the positive conditional mechanism and the sharp obstruction blocking it:
+\begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
+  \item \textbf{Conditional single-exponential bound ($\frac{1}{6} 12^a$):} In each $2$-adic tropical/sign cell $(\pi, \sigma)$ ($3^{r-1} 2^r$ cells at addition depth $r$), writing $y_j = \sigma_j 2^{v_j} \exp_2(4\theta_j)$ yields a system $G_1 = \dots = G_{r-1} = 0$ of $3$-term $2$-adic exponential sums together with a \emph{linear} output equation $B_r(\boldsymbol{\theta}) = 0$. Because $v_2(4^d / \mathbf{k}!) \ge d + s_2(d) \ge 5$ for all $d = |\mathbf{k}| \ge 3$ while $\max_{|\mathbf{m}| \in \{1,2\}} v_2(4^{|\mathbf{m}|}/\mathbf{m}!) = 4$, the normalized reduction $\overline{G}_j = 2^{-e_j} G_j \bmod 2 \in \F_2[\boldsymbol{\theta}]$ has degree $\le 2$ (\emph{Quadratic Mod-$2$ Reduction Lemma}). Eliminating one variable over $\Z_2$ via the linear equation $B_r = 0$, if $(\overline{G}_1, \dots, \overline{G}_{r-1}, \overline{B}_r)$ is $0$-dimensional over $\F_2$, affine B\'ezout bounds $\dim_{\F_2} \le 2^{r-1}$; since the integral Tate algebra $T_r^\circ = \Z_2\langle \theta_0, \dots, \theta_{r-1} \rangle$ is Noetherian with $2 \in \mathrm{Jac}(T_r^\circ)$, Krull's Intersection Theorem and complete Nakayama bound the root count in the cell by $2^{r-1}$, giving $\le 3^{r-1} 2^r 2^{r-1} = \frac{1}{6} 12^r$ roots in $\Q_2^*$.
+  \item \textbf{Refutation of perturbation / valued-extension deformation (Hensel Scale Dichotomy):} Unlike the real setting (where ratio perturbation $M_r N_r^{-1} = -s_r \pm \varepsilon$ enforces nondegeneracy in Bihan--Sottile), generic perturbation \emph{cannot} rescue mod-$2$ degeneracy. Explicitly, $G_1 = 2 + e^{4t_1} - 3 e^{4(t_1+t_2)}$ and $G_2 = 2 - 3 e^{4(t_1+2t_2)} + e^{4(t_1+3t_2)}$ share $\overline{G}_1 = \overline{G}_2 = t_2$, while $G_1 - G_2 = -e^{4t_1}(e^{4t_2} - 1)^3$ jumps in degree to $3$. For any system with simple roots $\boldsymbol{\theta}^{(k)}$ inside a mod-$2$ degenerate cell, any Hensel-safe perturbation $\delta_j$ preserving all roots must satisfy $v_2(\delta_j) > 2 \max_k v_2(\det J_G(\boldsymbol{\theta}^{(k)})) \ge e_j$, leaving $2^{-e_j}(G_j + \delta_j) \bmod 2 = \overline{G}_j$ identically unchanged; larger perturbations ($v_2(\delta_j) \le e_j$) destroy original roots; and every valuation ordering on $\Q_2(\!(t)\!)$ either preserves $\F_2$-degeneracy ($|t| \ll |2|_2$), destroys roots ($|2|_2 \ll |t| < 1$), or diverges for $\exp_2$ ($|2|_t = 1$).
+\end{enumerate}
+
+\section{Lean~4.36.0 Verification Summary}
+
+All three main theorems (Theorems~\ref{thm:uniform-padic}, \ref{thm:real-5c}, and~\ref{thm:cubic-z2}) are formalized in Lean~4.36.0 with Mathlib~v4.36.0 in the repository \code{0xOsprey/shub-smale-tau9}:
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabularx}{\textwidth}{lrrX}
+\toprule
+Module & LOC & Thms & Headline Declarations \\
+\midrule
+\code{RealLowerBound.lean} & $436$ & $13$ & \code{tau\_real\_5C}, \code{tau\_real\_5C\_beats\_chebyshev} \\
+\code{UniformPadicBarrier.lean} & $1{,}410$ & $24$ & \code{tau\_padic2\_cubic}, \code{tau\_padic\_fermat}, \code{tau\_padic\_rate\_}\allowbreak\code{arbitrarily\_close\_to\_one} \\
+\bottomrule
+\end{tabularx}
+\caption{Summary of new Lean~4.36.0 modules ($1{,}846$ LOC, $37$ theorems, $0$ \code{sorry}, $0$ \code{native\_decide}, strictly $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$).}
+\end{table}
+
+\section*{Honest Scope \& AI Disclosure}
+This paper establishes local exponential lower bounds and a uniform $p$-adic barrier relevant to \code{IIS-O-1205}. It does \textbf{not} prove $\zmax^{\Z}(\tau) \le 2^{(1-\varepsilon)\tau}$, nor does it resolve the full Shub--Smale $\tau$-conjecture ($c \ge 2$) or $\mathrm{P}$ vs $\mathrm{NP}$. Theorems~\ref{thm:uniform-padic}, \ref{thm:real-5c}, and~\ref{thm:cubic-z2} are completely machine-verified in Lean~4.36.0; the Section~5 $2$-adic obstruction analysis and the exhaustive $g = 5, 6$ computational search are analytic/computational results outside the Lean kernel. Developed with AI assistance (Antigravity Harness + Gemini~4 Neon).
+
+\begin{thebibliography}{9}
+\bibitem{ShubSmale1995} M.~Shub and S.~Smale, \emph{On the intractability of Hilbert's Nullstellensatz and an algebraic version of ``$\mathrm{NP} \neq \mathrm{P}$?''}, Duke Math.\ J.\ \textbf{81} (1995), 47--54.
+\bibitem{Rojas2002} J.~M.~Rojas, \emph{Additive complexity and the roots of polynomials over number fields and $p$-adic fields}, ANTS~V, LNCS 2369 (2002), 506--515, \code{arXiv:math/0201154}.
+\bibitem{Rojas2003} J.~M.~Rojas, \emph{Why polyhedra matter in non-linear equation solving}, Contemp.\ Math.\ \textbf{334} (2003), 293--320, \code{arXiv:math/0304100}.
+\bibitem{BihanSottile2007} F.~Bihan and F.~Sottile, \emph{New fewnomial upper bounds from Gale dual polynomial systems}, Moscow Math.\ J.\ \textbf{7} (2007), 387--407.
+\bibitem{Paper1} 0xOsprey, \emph{Exact Integer-Root Thresholds $z_{\max}(9) = 6$ and $z_{\max}(10) = 7$ for the Shub--Smale $\tau$-Conjecture}, \code{isitsolved.com} preprint \code{iis:2611.00113} (Nov.~2026).
+\bibitem{Paper2} 0xOsprey, \emph{Unconditional Refutation of Every Sub-Quadratic Exponent ($c < 2$) in the Shub--Smale $\tau$-Conjecture, Real-Root Upper Bounds, and a $2$-Adic Barrier}, \code{isitsolved.com} preprint \code{iis:2611.00175} (Nov.~2026).
+\end{thebibliography}
+
+\end{document}
