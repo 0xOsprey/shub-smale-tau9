@@ -1,29 +1,34 @@
-# `shub-smale-tau9`: $`z_{\max}(9) = 6`$, $`z_{\max}(10) = 7`$, Records up to $`\tau = 18`$, and Lean 4 Soundness Proofs
+# `shub-smale-tau9`: Unconditional $`c < 2`$ Refutation, $`z_{\max}(9) = 6`$, $`z_{\max}(10) = 7`$, Records up to $`\tau = 18`$, and Lean 4 Proofs
 
-[![Independent Lean 4 Receipt](https://img.shields.io/badge/isitsolved.com_Lean_4_Receipt-ACCEPTED-2ea043)](https://isitsolved.com/lean/receipts/31455fc47d7b)
+[![Lean 4 Receipt #2: bf489be0b160](https://img.shields.io/badge/Lean_4_Receipt_2_bf489be0b160-ACCEPTED-2ea043)](https://isitsolved.com/lean/receipts/bf489be0b160)
+[![Lean 4 Receipt #1: 31455fc47d7b](https://img.shields.io/badge/Lean_4_Receipt_1_31455fc47d7b-ACCEPTED-2ea043)](https://isitsolved.com/lean/receipts/31455fc47d7b)
+[![Paper 2: iis:2611.00175](https://img.shields.io/badge/Paper_2-iis%3A2611.00175-0969da)](https://isitsolved.com/journal/0099c1cf2ff2)
+[![Paper 1: iis:2611.00113](https://img.shields.io/badge/Paper_1-iis%3A2611.00113-0969da)](https://isitsolved.com/journal/39b8a928ed68)
 
-**Settling the 7- and 8-root thresholds of Smale's 4th Problem (the Shub–Smale $`\tau`$-conjecture) over all of $`\mathbb{Z}`$.**
+**Unconditionally refuting every real sub-quadratic exponent $`c < 2`$ and settling the 7- and 8-root thresholds of Smale's 4th Problem (the Shub–Smale $`\tau`$-conjecture) over all of $`\mathbb{Z}`$.**
 
 ---
 
 ## TL;DR
 
-- **NEW — Unconditional Lean 4 refutation of every sub-quadratic exponent $`c < 2`$:** Using a fraction-free Chirp-$`z`$ $`q`$-Pochhammer SLP and division-free Schönhage–Nussbaumer negacyclic FFT over $`\mathbb{Z}[x]`$, we prove completely inside Lean 4 (`tau_refutes_subquadratic`, `tau_subquadratic_growth`, `tau_crossover_1884_2049`):
+- **NEW — Unconditional Lean 4 refutation of every sub-quadratic exponent $`c < 2`$ ([`iis:2611.00175`](https://isitsolved.com/journal/0099c1cf2ff2), Receipt [`bf489be0b160`](https://isitsolved.com/lean/receipts/bf489be0b160) `ACCEPTED`, partial claim [`IIS-C-1778`](https://isitsolved.com/claims/1778)):** Using a fraction-free Chirp-$`z`$ $`q`$-Pochhammer SLP and division-free Schönhage–Nussbaumer negacyclic FFT over $`\mathbb{Z}[x]`$, we prove completely inside Lean 4 (`tau_refutes_subquadratic`, `tau_subquadratic_growth`, `tau_crossover_1884_2049`, `tau_exists_roots_gt_gates`, `tau_karatsuba_growth`, `tau_refutes_linear`):
   ```math
   z_{\max}(\tau) = \Omega\!\left(\frac{\tau^2}{\log^2 \tau \cdot (\log\log \tau)^2}\right), \qquad z_{\max}(1884) \ge 2049 > 1884,
   ```
-  unconditionally refuting $`c = 1`$ and every real $`c < 2`$ in [`IIS-O-1205`](https://isitsolved.com/open/IIS-O-1205), alongside a Lean-verified $`2`$-adic exponential lower bound (`tau_padic_two_pow`: $`z_{\max}^{\mathbb{Z}_2}(4k) \ge 2^k`$) establishing a Local-vs-Global barrier and an unconditional real-root upper bound $`z_{\max}(\tau) \le 2^{\tau - (\sqrt{2}-o(1))\sqrt{\tau}}`$. See [`paper/tau_subquadratic_refutation.pdf`](paper/tau_subquadratic_refutation.pdf).
-- **Exact finite-$`\tau`$ census:** Extending Santibáñez-Leal's 2026 census $`z_{\max}(1\dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)`$, we establish over **all of $`\mathbb{Z}`$** (no root-magnitude cutoff, zero hash-collision reliance; published at [`iis:2611.00113`](https://isitsolved.com/journal/39b8a928ed68)):
+  unconditionally refuting $`c = 1`$ and every real $`c < 2`$ in [`IIS-O-1205`](https://isitsolved.com/open/IIS-O-1205), alongside a Lean-verified $`2`$-adic exponential lower bound (`tau_padic_two_pow`: $`z_{\max}^{\mathbb{Z}_2}(4k) \ge 2^k`$) establishing a Local-vs-Global barrier and an analytic unconditional DAG real-root upper bound $`z_{\max}(\tau) \le z_{\max}^{\mathbb{R}}(\tau) \le 2^{\tau - (\sqrt{2}-o(1))\sqrt{\tau}}`$. Read companion paper [`iis:2611.00175`](https://isitsolved.com/journal/0099c1cf2ff2) ([local PDF](paper/tau_subquadratic_refutation.pdf)).
+- **Independent Lean 4 Receipts (`ACCEPTED` by third-party node `spark-receipts`):** Both formalization suites are independently built from source with `0 sorry`, `0 native_decide`, and strictly `{propext, Classical.choice, Quot.sound}`:
+  - **Receipt #2 (Asymptotic $`c < 2`$ refutation, $`z_{\max}(1884) \ge 2049`$, $`2`$-adic barrier):** [**`bf489be0b160`**](https://isitsolved.com/lean/receipts/bf489be0b160) (commit `54f25f8`, 3 modules, 7 headline theorems; [proof map JSON](https://isitsolved.com/lean/receipts/bf489be0b160/map.json)) — companion paper [`iis:2611.00175`](https://isitsolved.com/journal/0099c1cf2ff2), partial claim [`IIS-C-1778`](https://isitsolved.com/claims/1778).
+  - **Receipt #1 (Finite-$`\tau`$ census soundness, records through $`\tau=18`$, $`m \le 4`$ sharpness):** [**`31455fc47d7b`**](https://isitsolved.com/lean/receipts/31455fc47d7b) ([proof map JSON](https://isitsolved.com/lean/receipts/31455fc47d7b/map.json)) — companion paper [`iis:2611.00113`](https://isitsolved.com/journal/39b8a928ed68), partial claim [`IIS-C-1773`](https://isitsolved.com/claims/1773).
+- **Exact finite-$`\tau`$ census:** Extending Santibáñez-Leal's 2026 census $`z_{\max}(1\dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)`$, we establish over **all of $`\mathbb{Z}`$** (no root-magnitude cutoff, zero hash-collision reliance; published at [`iis:2611.00113`](https://isitsolved.com/journal/39b8a928ed68), partial claim [`IIS-C-1773`](https://isitsolved.com/claims/1773)):
   ```math
   z_{\max}(1 \dots 10) = (1, 2, 3, 3, 4, 5, 5, 6, 6, 7), \qquad z_{\max}(11) \ge 8.
   ```
-- **Independent Lean 4 Receipt (`ACCEPTED`):** Built from source by third-party vetted node `spark-receipts` at [**isitsolved.com/lean/receipts/31455fc47d7b**](https://isitsolved.com/lean/receipts/31455fc47d7b) (`0 sorry`, `0` extra axioms beyond `{propext, Classical.choice, Quot.sound}`, `0 native_decide`; [proof map JSON](https://isitsolved.com/lean/receipts/31455fc47d7b/map.json)).
 - **Constructive records:** Lean-verified witnesses pushing known finite-$`\tau`$ records through $`\tau = 18`$ ($`z_{\max}(12)\ge 9`$, $`z_{\max}(13)\ge 10`$, $`z_{\max}(15)\ge 11`$, $`z_{\max}(16)\ge 12`$, $`z_{\max}(17)\ge 13`$, $`z_{\max}(18)\ge 14`$) and exact bounded-multiplication sharpness $`\max_{\mathrm{mul}(P)\le m} z_{\mathbb{Z}}(P) = 2^m`$ for $`m \le 4`$.
-- **Paper & quick audit:** Read [`paper/tau_conjecture_z9.pdf`](paper/tau_conjecture_z9.pdf), review the 5-minute external audit bundle [`audit/EXTERNAL_REVIEW_BUNDLE.md`](audit/EXTERNAL_REVIEW_BUNDLE.md), or run `./reproduce/reproduce.sh quick` (~1–3 min).
+- **Papers & quick audit:** Read [`paper/tau_subquadratic_refutation.pdf`](paper/tau_subquadratic_refutation.pdf) ([`iis:2611.00175`](https://isitsolved.com/journal/0099c1cf2ff2)) and [`paper/tau_conjecture_z9.pdf`](paper/tau_conjecture_z9.pdf) ([`iis:2611.00113`](https://isitsolved.com/journal/39b8a928ed68)), review the 5-minute external audit bundle [`audit/EXTERNAL_REVIEW_BUNDLE.md`](audit/EXTERNAL_REVIEW_BUNDLE.md), or run `./reproduce/reproduce.sh quick` (~1–3 min).
 
-> **Honest scope note:** This work does **not** resolve P vs NP or the full asymptotic $`\tau`$-conjecture. Lean 4 proves the conditional implications `hcheck → z_max(τ) ≤ K` (where `hcheck` requires certifying all canonical gate lists of every shorter length $`1 \le n \le \tau`$), plus every per-leaf certificate and every lower-bound witness; the raw C enumeration loop (`tau_certify_exact.c`) and external `python-flint` / Python $`\mathbb{Z}[x]`$ runs remain outside the Lean kernel.
+> **Honest scope note:** This work unconditionally refutes every real sub-quadratic exponent $`c < 2`$ in [`IIS-O-1205`](https://isitsolved.com/open/IIS-O-1205), but does **not** resolve $`c \ge 2`$ (the full asymptotic Shub–Smale $`\tau`$-conjecture) or P vs NP. The $`c < 2`$ refutation, concrete crossover $`z_{\max}(1884) \ge 2049`$, and $`2`$-adic barrier are proved unconditionally inside Lean 4 (receipt [`bf489be0b160`](https://isitsolved.com/lean/receipts/bf489be0b160)); the real-root DAG upper bound $`z_{\max}(\tau) \le z_{\max}^{\mathbb{R}}(\tau) \le 2^{\tau - (\sqrt{2}-o(1))\sqrt{\tau}}`$ is proved analytically in [`iis:2611.00175`](https://isitsolved.com/journal/0099c1cf2ff2) (not formalized in Lean). For the finite-$`\tau`$ census ([`iis:2611.00113`](https://isitsolved.com/journal/39b8a928ed68)), Lean 4 (receipt [`31455fc47d7b`](https://isitsolved.com/lean/receipts/31455fc47d7b)) proves the conditional implications `hcheck → z_max(τ) ≤ K` (where `hcheck` requires certifying all canonical gate lists of every shorter length $`1 \le n \le \tau`$), plus every per-leaf certificate and every lower-bound witness; the raw C enumeration loop (`tau_certify_exact.c`) and external `python-flint` / Python $`\mathbb{Z}[x]`$ runs remain outside the Lean kernel.
 >
-> **AI & provenance disclosure:** Developed with AI assistance (**Antigravity Harness + Gemini 4 Neon**) and audited via two red-team reviews, an independent naive Rust enumerator, `python-flint`, mutation testing, and an independent third-party Lean 4 build. Every bug and overclaim caught during auditing is transparently logged in [`audit/BUGS.md`](audit/BUGS.md).
+> **AI & provenance disclosure:** Developed with AI assistance (**Antigravity Harness + Gemini 4 Neon**) and audited via two red-team reviews, an independent naive Rust enumerator, `python-flint`, mutation testing, and two independent third-party Lean 4 builds (`bf489be0b160` and `31455fc47d7b`). Every bug and overclaim caught during auditing is transparently logged in [`audit/BUGS.md`](audit/BUGS.md).
 
 ---
 
@@ -31,7 +36,7 @@
 
 The **Shub–Smale $`\tau`$-conjecture** (Smale's 4th Problem; [`IIS-O-1205`](https://isitsolved.com/open/IIS-O-1205)) asks whether the number of distinct integer roots $`z_{\mathbb{Z}}(f)`$ of any nonzero univariate polynomial $`f \in \mathbb{Z}[x]`$ is bounded polynomially in its constant-free straight-line program (SLP) complexity $`\tau(f)`$ (built from $`\{1, x\}`$ using only $`\{+, -, \times\}`$). An affirmative resolution implies $`\mathrm{P}_{\mathbb{C}} \neq \mathrm{NP}_{\mathbb{C}}`$ in the Blum–Shub–Smale model.
 
-In August/September 2026, **Felipe Santibáñez-Leal** established $`z_{\max}(1 \dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)`$, proved $`z_{\max}(10) \ge 7`$, and ruled out multiplication-final 9-gate SLPs — leaving open additive/subtractive final gates at $`\tau = 9`$ and whether $`z_{\max}(10)`$ equals $`7`$ or $`8`$. This repository closes both unrestricted frontiers over all of $`\mathbb{Z}`$.
+In August/September 2026, **Felipe Santibáñez-Leal** established $`z_{\max}(1 \dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)`$, proved $`z_{\max}(10) \ge 7`$, and ruled out multiplication-final 9-gate SLPs — leaving open additive/subtractive final gates at $`\tau = 9`$ and whether $`z_{\max}(10)`$ equals $`7`$ or $`8`$. This repository closes both unrestricted finite-$`\tau`$ frontiers over all of $`\mathbb{Z}`$ ([`iis:2611.00113`](https://isitsolved.com/journal/39b8a928ed68)) and unconditionally refutes every real sub-quadratic exponent $`c < 2`$ ([`iis:2611.00175`](https://isitsolved.com/journal/0099c1cf2ff2)).
 
 ---
 
@@ -39,6 +44,8 @@ In August/September 2026, **Felipe Santibáñez-Leal** established $`z_{\max}(1 
 
 | Layer | Verified By | Status |
 |---|---|---|
+| Unconditional $`c < 2`$ refutation (`tau_subquadratic_growth`, `tau_refutes_subquadratic`), Karatsuba linear refutation (`tau_karatsuba_growth`, `tau_refutes_linear`), crossover (`tau_crossover_1884_2049`, `tau_exists_roots_gt_gates`), and $`2`$-adic barrier (`tau_padic_two_pow`) | Lean 4.36.0 kernel + independent build ([receipt `bf489be0b160`](https://isitsolved.com/lean/receipts/bf489be0b160)) | **ACCEPTED** (`0 sorry`, `0 native_decide`, standard axioms) |
+| Unconditional DAG real-root upper bound $`z_{\max}(\tau) \le z_{\max}^{\mathbb{R}}(\tau) \le 2^{\tau - (\sqrt{2}-o(1))\sqrt{\tau}}`$ | Analytic perturbed Bihan–Sottile proof in [`iis:2611.00175`](https://isitsolved.com/journal/0099c1cf2ff2) ([PDF](paper/tau_subquadratic_refutation.pdf)) | Paper proof (not in Lean) |
 | Canonicalization, dead-gate bounds, checklist reduction (`zmax9_le_six_of_checklist`, `zmax10_le_seven_of_checklist`) | Lean 4.36.0 kernel + independent build ([receipt `31455fc47d7b`](https://isitsolved.com/lean/receipts/31455fc47d7b)) | **ACCEPTED** (`0 sorry`, standard axioms) |
 | Per-leaf certificates (degree, product mask, dual-number mod $`p`$, Taylor-stripped mod $`p`$, exact CRT) | Lean 4.36.0 kernel + independent build ([receipt `31455fc47d7b`](https://isitsolved.com/lean/receipts/31455fc47d7b)) | **ACCEPTED** (`0 sorry`, standard axioms) |
 | Lower-bound witnesses ($`\tau = 6 \dots 18`$, $`m \le 4`$ sharpness, $`z_{\max}(3k) \ge 2k`$) | Lean 4.36.0 kernel + independent build ([receipt `31455fc47d7b`](https://isitsolved.com/lean/receipts/31455fc47d7b)) | **ACCEPTED** (`0 sorry`, standard axioms) |
@@ -51,7 +58,7 @@ In August/September 2026, **Felipe Santibáñez-Leal** established $`z_{\max}(1 
 ## Quick Reproduction
 
 ```bash
-# 1. Verify all 8 Lean 4 modules locally (4,228 LOC, 204 theorems/lemmas, 0 sorry)
+# 1. Verify all 11 Lean 4 modules locally (8,228 LOC, 293 theorems/lemmas, 0 sorry)
 lake exe cache get
 lake build Research
 
@@ -123,7 +130,9 @@ Proved in Lean 4 (`bounded_mult_exact_sharpness_four`) that the trivial degree c
 <details>
 <summary><strong>4. Lean 4.36.0 Modules (11 modules, 8,228 LOC, 293 theorems/lemmas, 0 sorry)</strong></summary>
 
-Independently built & verified at [isitsolved.com/lean/receipts/31455fc47d7b](https://isitsolved.com/lean/receipts/31455fc47d7b) (plus new receipt for the 3 asymptotic modules below):
+Independently built & verified from source by `spark-receipts` (`0 sorry`, `0 native_decide`, strictly `{propext, Classical.choice, Quot.sound}`):
+- **Receipt #1 (8 finite-$`\tau`$ census & witness modules):** [isitsolved.com/lean/receipts/31455fc47d7b](https://isitsolved.com/lean/receipts/31455fc47d7b) (`ACCEPTED`)
+- **Receipt #2 (3 asymptotic $`c < 2`$ refutation, crossover, and $`2`$-adic barrier modules):** [isitsolved.com/lean/receipts/bf489be0b160](https://isitsolved.com/lean/receipts/bf489be0b160) (`ACCEPTED`, commit `54f25f8`, 7 headline theorems)
 
 - [`Research/PvsNP/Tau/TauConjecture.lean`](Research/PvsNP/Tau/TauConjecture.lean) (344 LOC) — Constant-free `SLP`, `ShubSmaleTauConjecture`, degree & multiplication root bounds, computable `zMaxGe_of_evalInt` witness certifier.
 - [`Research/PvsNP/Tau/TauWitnesses.lean`](Research/PvsNP/Tau/TauWitnesses.lean) (114 LOC) — Verified witnesses for $`\tau = 6, 10, 11, 13`$ and 2-multiplication bound.
@@ -134,7 +143,7 @@ Independently built & verified at [isitsolved.com/lean/receipts/31455fc47d7b](ht
 - [`Research/PvsNP/Tau/Canonical.lean`](Research/PvsNP/Tau/Canonical.lean) (1,844 LOC) — Formal soundness of all canonicalization and dead-gate pruning rules (`exists_canonical`, `deadgate_count_bound`, `unusedWires_last_gate`, `zmax9_le_six_of_checklist`, `zmax10_le_seven_of_checklist`).
 - [`Research/PvsNP/Tau/CertSoundness.lean`](Research/PvsNP/Tau/CertSoundness.lean) (983 LOC) — Formal soundness of degree propagation, atomic product-mask union bound, dual-number modular evaluation, Taylor-stripped modular certificate, hash-mismatch inequality, and exact CRT zero certification.
 - [`Research/PvsNP/Tau/ChirpZ.lean`](Research/PvsNP/Tau/ChirpZ.lean) (1,624 LOC) — Compositional `CanBuild` SLP framework, fraction-free $`q`$-binomial theorem, Bluestein Chirp-$`z`$ identity, division-free Karatsuba multiplication, `tau_karatsuba_growth`, and `tau_refutes_linear`.
-- [`Research/PvsNP/Tau/SubquadraticRefutation.lean`](Research/PvsNP/Tau/SubquadraticRefutation.lean) (2,100 LOC) — Division-free Schönhage–Nussbaumer negacyclic FFT over $`\mathbb{Z}[x]`$, `tau_subquadratic_growth`, `tau_refutes_subquadratic` (all real $`c < 2`$), and concrete finite crossover `tau_crossover_1884_2049` (`zMaxGe 1884 2049`).
+- [`Research/PvsNP/Tau/SubquadraticRefutation.lean`](Research/PvsNP/Tau/SubquadraticRefutation.lean) (2,100 LOC) — Division-free Schönhage–Nussbaumer negacyclic FFT over $`\mathbb{Z}[x]`$, `tau_subquadratic_growth`, `tau_refutes_subquadratic` (all real $`c < 2`$), concrete finite crossover `tau_crossover_1884_2049` (`zMaxGe 1884 2049`), and `tau_exists_roots_gt_gates`.
 - [`Research/PvsNP/Tau/PadicBarrier.lean`](Research/PvsNP/Tau/PadicBarrier.lean) (276 LOC) — Explicit length-$`4k`$ SLP family and Hensel preimage tree proving `tau_padic_two_pow` ($`2^k`$ distinct roots in $`\mathbb{Z}_2`$).
 
 </details>
@@ -142,10 +151,11 @@ Independently built & verified at [isitsolved.com/lean/receipts/31455fc47d7b](ht
 <details>
 <summary><strong>5. Repository Layout</strong></summary>
 
-- [`paper/tau_conjecture_z9.pdf`](paper/tau_conjecture_z9.pdf) & [`paper/tau_conjecture_z9.tex`](paper/tau_conjecture_z9.tex) — Compiled PDF & LaTeX paper covering $`z_{\max}(9) = 6`$, $`z_{\max}(10) = 7`$, records up to $`\tau = 18`$, and Lean 4 proofs.
+- [`paper/tau_subquadratic_refutation.pdf`](paper/tau_subquadratic_refutation.pdf) & [`paper/tau_subquadratic_refutation.tex`](paper/tau_subquadratic_refutation.tex) — Compiled PDF & LaTeX companion paper ([`iis:2611.00175`](https://isitsolved.com/journal/0099c1cf2ff2)) covering the unconditional Lean 4 refutation of every real $`c < 2`$, $`z_{\max}(1884) \ge 2049`$, the real-root DAG upper bound, and the $`2`$-adic barrier.
+- [`paper/tau_conjecture_z9.pdf`](paper/tau_conjecture_z9.pdf) & [`paper/tau_conjecture_z9.tex`](paper/tau_conjecture_z9.tex) — Compiled PDF & LaTeX paper ([`iis:2611.00113`](https://isitsolved.com/journal/39b8a928ed68)) covering $`z_{\max}(9) = 6`$, $`z_{\max}(10) = 7`$, records up to $`\tau = 18`$, and Lean 4 proofs.
 - [`audit/`](audit/) — Red-team audits (`RED_TEAM_AUDIT.md`, `RED_TEAM_AUDIT_EXACT.md`), bug/overclaim log (`BUGS.md`), Phase 1 audit report (`PHASE1_REPORT.md`), external review bundle (`EXTERNAL_REVIEW_BUNDLE.md`), naive Rust enumerator (`naive_tau/`), `python-flint` root counter (`flint_roots.py`), and mutation suite (`mutation/`).
 - [`reproduce/`](reproduce/) — Tiered reproduction script (`reproduce.sh`), expected counters (`EXPECTED_OUTPUTS.md`), and per-item digests (`digests/`).
-- [`Research/PvsNP/Tau/`](Research/PvsNP/Tau/) — Lean 4.36.0 + Mathlib v4.36.0 formalization (8 modules, 4,228 LOC, 204 theorems/lemmas).
+- [`Research/PvsNP/Tau/`](Research/PvsNP/Tau/) — Lean 4.36.0 + Mathlib v4.36.0 formalization (11 modules, 8,228 LOC, 293 theorems/lemmas, `0 sorry`).
 - [`experiments/pvsnp/tau/`](experiments/pvsnp/tau/) — Hardened exact-CRT certifier (`tau_certify_exact.c`, `verify_survivors.py`, `EXACT_PIPELINE.md`, `z10_exact_report.md`) plus original provenance files (`tau_z9_unconditional.c`, `verify_z9_all_Z.py`, `z9_unconditional_report.md`).
 - [`OEIS_SUBMISSION.txt`](OEIS_SUBMISSION.txt) — OEIS draft for `1, 2, 3, 3, 4, 5, 5, 6, 6, 7`.
 - [`outreach/`](outreach/) — Draft correspondence and social summary (prepared for review).
