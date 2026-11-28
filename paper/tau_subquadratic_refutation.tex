@@ -1,0 +1,255 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\zmax}{z_{\max}}
+\newcommand{\zZ}{z_{\Z}}
+
+\title{Unconditional Refutation of Every Sub-Quadratic Exponent ($c < 2$) in the Shub--Smale $\tau$-Conjecture, Sharpened Real-Root Upper Bounds, and a $2$-Adic Local-vs-Global Barrier (with Lean~4 Formalization)}
+
+\author{0xOsprey}
+
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Smale's 4th Problem---the Shub--Smale $\tau$-conjecture (\code{IIS-O-1205})---asks whether there exist universal constants $a > 0$ and $c \ge 1$ such that every nonzero univariate integer polynomial $f \in \Z[x]$ has at most $a(1 + \tau(f))^c$ distinct integer zeros, where $\tau(f)$ is its shortest constant-free, division-free straight-line program (SLP) length over $\{+, -, \times\}$ starting from $\{1, x\}$. Until recently, even the linear case $c = 1$ (whether $\zmax(\tau) = \omega(\tau)$ is achievable) was highlighted as open in finite-$\tau$ census studies (Santiba\~{n}ez-Leal, August 2026; \code{iis:2611.00113}).
+
+We establish three unconditional asymptotic theorems---two of them completely machine-verified in Lean~4.36.0 ($4{,}000$ lines across three new modules, $89$ theorems, zero \code{sorryAx}, strictly $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$):
+\begin{enumerate}[label=(\arabic*),leftmargin=1.8em]
+  \item \textbf{Unconditional refutation of every real exponent $c < 2$ (Lean~4: \code{tau\_refutes\_subquadratic}):} Using a fraction-free $q$-binomial identity ($D_m \binom{m}{r}_4 = P_r P_{m-r}$), Bluestein's chirp-$z$ identity, and division-free Sch\"onhage--Nussbaumer negacyclic FFT modulo $t^{2m} + 1$ (leaving middle coefficients $[m, 2m-1]$ uncorrupted), we construct explicit constant-free SLPs over $\Z[x]$ computing $C_m x \prod_{n=0}^{m^2-1}(x^2 - 4^n)$ ($C_m > 0$) with $2m^2 + 1$ distinct integer roots in $O(m \log m \log\log m)$ gates, proving
+  \[
+    \zmax(\tau) \;=\; \Omega\!\left(\frac{\tau^2}{\log^2 \tau \cdot (\log\log \tau)^2}\right)
+  \]
+  and refuting $\exists a \in \R,\ \forall f,\ \zZ(f) \le a(\tau(f) + 1)^c$ for every real $c < 2$. An elementary Karatsuba middle-product variant gives $\zmax(\tau) = \Omega(\tau^{2/\log_2 3}) \approx \Omega(\tau^{1.2618})$ (\code{tau\_refutes\_linear}) and yields the first machine-verified finite crossover strictly beating $z \le \tau$: $\zmax(1884) \ge 2049$ (\code{tau\_crossover\_1884\_2049}; a CSE-optimized arbitrary-$n$ Python construction further achieves $\zmax(880) \ge 883$). A division-free Bostan--Gaudry--Schost (2007) shift variant matches the same $\Omega(\tau^2 / (\log^2 \tau (\log\log \tau)^2))$ bound using \emph{consecutive} integer roots $\{0, \dots, m^2-1\}$.
+  \item \textbf{Unconditional upper bound beating $2^{\tau-1}/\tau$ for full DAG SLPs over $\R$:} Applying ratio perturbation $M_r N_r^{-1} = -s_r \pm \varepsilon$ to enforce Jacobian nondegeneracy and binomial elimination ($n = l = r - 1$) inside Bihan--Sottile (2007, Theorem~1), we prove unconditionally for every DAG SLP over $\R[x]$:
+  \[
+    \zmax(\tau) \;\le\; \zmax^{\R}(\tau) \;\le\; 2^{\tau - (\sqrt{2} - o(1))\sqrt{\tau}},
+  \]
+  improving on the Mahler-height baseline $2^{\tau-1}/\tau$ for all $\tau \ge 15$ (when paired with Mahler) and $\tau \ge 50$ purely over $\R$.
+  \item \textbf{Unconditional $2$-adic exponential lower bound and Local-vs-Global barrier (Lean~4: \code{tau\_padic\_two\_pow}):} The explicit constant-free SLP family $P_0(x) = x^2 - 1$, $c_1 = 64$, $c_{n+1} = 64 c_n^2$, $P_{n+1}(x) = P_n(x)^2 - c_{n+1}$ has length $\tau(P_n) \le 4(n+1)$ and at least $2^{n+1}$ distinct simple roots in $\Z_2$ (generalizing to any finite set of finite primes $S$). Combined with Chebyshev polynomials over $\R$ ($2^{(\tau-1)/2}$) and $x^{2^{\tau-1}} - 1$ over $\F_p$, this proves that \emph{no purely local method over $\R$, $\Q_p$, or $\F_p$ can ever prove $\zmax(\tau) = 2^{o(\tau)}$ or the $\tau$-conjecture}.
+\end{enumerate}
+Finally, we analyze why beating $c = 2$ (or resolving \code{IIS-O-1205} in full) remains blocked in both directions, isolating the characteristic-$0$ torsion obstruction that prevents recent subexponential integer-factorial circuits (Zhang \& Xuan, October 2026) from lifting to $\Z[x]$. This work does \textbf{not} resolve the full Shub--Smale $\tau$-conjecture ($c \ge 2$) or $\mathrm{P}$ vs $\mathrm{NP}$; it was developed with AI assistance (Antigravity Harness + Gemini 4 Neon) and machine-verified in Lean~4.36.0.
+\end{abstract}
+
+\section{Introduction and Prior-Art Positioning}
+
+Let $f \in \Z[x]$ be nonzero. Its \emph{constant-free straight-line program complexity} $\tau(f)$ is the minimum length $\tau$ of a sequence of gates $g_1, \dots, g_\tau$ starting from $g_{-1} = 1$ and $g_0 = x$ with $g_k = g_i \circ_k g_j$, $\circ_k \in \{+, -, \times\}$, $-1 \le i, j < k$, and $g_\tau = f$. Let $\zZ(f) := |\{r \in \Z : f(r) = 0\}|$ and $\zmax(\tau) := \max\{\zZ(f) : f \in \Z[x] \setminus \{0\},\, \tau(f) \le \tau\}$. Smale's 4th Problem~\cite{ShubSmale1995,Smale1998} (\code{IIS-O-1205}) asks whether universal constants $a > 0$ and $c \ge 1$ exist with $\zmax(\tau) \le a(1 + \tau)^c$.
+
+In our companion census paper~\cite{Osprey2026Census} (\code{iis:2611.00113}), extending Santiba\~{n}ez-Leal~\cite{SantibanezLeal2026}, we established $\zmax(1 \dots 10) = (1, 2, 3, 3, 4, 5, 5, 6, 6, 7)$, constructive records through $\tau = 18$ ($\zmax(18) \ge 14$), and the classical pronic linear baseline $\zmax(3k) \ge 2k$. Both~\cite{SantibanezLeal2026} (which explicitly noted that $z(f) \le (1 + \tau(f))^\kappa$ ``remains open even for $\kappa = 1$'') and~\cite{Osprey2026Census} left open whether superlinear growth $\zmax(\tau) = \omega(\tau)$ is achievable.
+
+\paragraph{Honest attribution to algorithmic precursors.}
+The baby-step/giant-step $\tilde{O}(\sqrt{N})$ paradigm is classical for \emph{scalar} factorials and $q$-factorials over fields with divisions: Pollard (1974), Strassen~\cite{Strassen1976} ($\tau(N!) = O(\sqrt{N} \log^2 N)$ for integers), Bostan--Gaudry--Schost~\cite{BGS2007} ($O(\sqrt{N} \log N)$ shifts over fields with division), and Bostan--Yurkevich~\cite{BostanYurkevich2022}. For division-free ring polynomial multiplication, Cantor--Kaltofen~\cite{CantorKaltofen1991} established $O(n \log n \log\log n)$ operations over arbitrary algebras. In the \emph{non-scalar product-gate} model (free arbitrary constants and free additions), Paterson--Stockmeyer~\cite{PatersonStockmeyer1973} (cited by Borchert--McKenzie--Reinhardt~\cite{BMR2013}) yields $O(\sqrt{d})$ multiplications for any degree-$d$ polynomial, but requires $\Theta(d)$ total gates ($z = O(\tau)$) in Shub--Smale's constant-free model. Lifting baby-step/giant-step evaluation to an elementary, completely \emph{constant-free and division-free} $\Z[x]$ SLP refuting every $c < 2$---and formally verifying the entire construction, FFT algebra, and refutation in Lean~4---closes this gap cleanly.
+
+\section{Unconditional Refutation of Every Sub-Quadratic Exponent ($c < 2$)}\label{sec:subquad}
+
+\subsection{Fraction-Free $q$-Binomial Theorem and Bluestein Chirp-$z$ Identity}
+Over any commutative ring $R$ and any $q \in R$, define
+\[
+  D_m(q) := \prod_{j=0}^{m-1} (q^{j+1} - 1), \qquad
+  Q_{m,r}(q) := \left(\prod_{j=0}^{r-1} (q^{m-j} - 1)\right)\left(\prod_{j=r}^{m-1} (q^{j+1} - 1)\right).
+\]
+Reindexing the second product by $k = m - 1 - j$ gives the symmetry $Q_{m,r}(q) = P_r(q) \cdot P_{m-r}(q)$ where $P_k(q) := \prod_{j=0}^{k-1} (q^{m-j} - 1)$ (Lean: \code{qBinomNum\_eq\_prefix\_mul}). Thus all $m + 1$ numerators $Q_{m,r}$ share a single $m$-gate prefix-product table.
+
+\begin{lemma}[Fraction-Free $q$-Pascal and $q$-Binomial Theorem; Lean: \code{q\_binomial\_fraction\_free}]\label{lem:qbinom}
+In every commutative ring $R$, for $1 \le r \le m$:
+\[
+  Q_{m+1,r}(q) = (q^{m+1} - 1)\bigl(Q_{m,r-1}(q) + q^r Q_{m,r}(q)\bigr),
+\]
+and consequently for all $m \ge 0$ and all $u, v \in R$:
+\[
+  D_m(q) \prod_{j=0}^{m-1} (u - q^j v) \;=\; \sum_{r=0}^m (-1)^{m-r} q^{\binom{m-r}{2}} Q_{m,r}(q)\, u^r v^{m-r}.
+\]
+\end{lemma}
+
+Setting $q = 4$, $w = 2^m$ (so $w^2 = 4^m$), $u = x^2$, and $v = w^{2i} = 4^{im}$ in Lemma~\ref{lem:qbinom}, we define in $\Z[x]$:
+\begin{align*}
+  A_r(x) &:= (-1)^{m-r} 4^{\binom{m-r}{2}} Q_{m,r}(4)\, w^{m^2 - (m-r)^2} x^{2r} \qquad (0 \le r \le m), \\
+  B_s &:= w^{s^2} \qquad (0 \le s < 2m),
+\end{align*}
+with $A_r(x) = 0$ for $r > m$. Because $m^2 - (m-r)^2 + (i + m - r)^2 = m^2 + i^2 + 2i(m-r)$ for all $0 \le i < m$ and $0 \le r \le m$ (and $0 \le i + m - r < 2m$), we obtain the exact Bluestein identity with strictly non-negative exponents:
+
+\begin{proposition}[Chirp-$z$ Middle-Product Identity; Lean: \code{chirp\_middle\_product\_eq}, \code{negConv\_chirp\_eq}]\label{prop:chirp}
+For every $m \ge 1$ and $0 \le i < m$,
+\[
+  V_i(x) \;:=\; \sum_{r=0}^m A_r(x) B_{i+m-r} \;=\; w^{m^2 + i^2} D_m(4) \prod_{j=0}^{m-1} (x^2 - 4^{im+j}).
+\]
+Moreover, viewing $A(t) = \sum_{r=0}^m A_r t^r$ and $B(t) = \sum_{s=0}^{2m-1} B_s t^s$ as length-$2m$ vectors in $(\Z[x])[t]/(t^{2m} + 1)$, the negacyclic convolution satisfies $[t^{i+m}](A(t)B(t) \bmod (t^{2m} + 1)) = V_i(x)$ identically for all $0 \le i < m$, because $\deg_t(AB) \le 3m - 1$ wraps degrees $[2m, 3m-1]$ strictly into $[0, m-1]$.
+\end{proposition}
+
+Multiplying $x \prod_{i=0}^{m-1} (S_{\mathrm{out}} V_i(x))$ for any uniform positive integer scale $S_{\mathrm{out}} > 0$ gives $C_m x \prod_{n=0}^{m^2-1} (x^2 - 4^n)$ with $C_m > 0$, which is nonzero (at $x = 3$, $3^2 - 4^n$ is odd for $n \ge 1$ and $8$ for $n = 0$) and has at least $2m^2 + 1$ distinct integer roots $\{0, \pm 1, \pm 2, \dots, \pm 2^{m^2-1}\}$ (Lean: \code{chirp\_poly\_root\_count}). All input wires $\{0\} \cup \{A_r\}_{r \le m} \cup \{B_s\}_{s < 2m}$ are built from $\{1, x\}$ in at most $16m + 12$ constant-free gates using second differences for $w^{s^2}$ and prefix products for $Q_{m,r}(4)$, $(-1)^d 4^{\binom{d}{2}} = \prod_{j<d}(-4^j)$, and $w^{m^2-(m-r)^2} = \prod_{k<r} w^{2(m-1-k)+1}$ (Lean: \code{canBuild\_chirp\_inputs}, \code{zMaxGe\_of\_chirp\_engine}).
+
+\subsection{Karatsuba Refutation of $c = 1$ and Concrete Finite Crossovers ($z > \tau$)}
+Plugging division-free Karatsuba multiplication of size $2^{k+1}$ (cost $\le 9 \cdot 3^{k+1}$) into Proposition~\ref{prop:chirp} at $m = 2^k$ yields $\zmax(50 \cdot 3^k) \ge 2 \cdot 4^k + 1$ for all $k \ge 1$ (Lean: \code{tau\_karatsuba\_growth}), immediately refuting linear growth (Lean: \code{tau\_refutes\_linear}).
+
+Using a power-of-$2$ Karatsuba middle product of size $2^k$ (\code{canBuild\_karaMid}: base case $k = 2$ costing $28$ gates, recurrence $M(k+1) = 3 M(k) + 7 \cdot 2^k - 2$, so $M(5) = 1{,}262$) at $m = 32 = 2^5$ gives our kernel-checked concrete crossover strictly beating $z \le \tau$:
+\begin{theorem}[Machine-Verified Crossover; Lean: \code{tau\_crossover\_1884\_2049}]\label{thm:cross}
+$\zmax(1884) \ge 2049 > 1884$.
+\end{theorem}
+\noindent (An optimized Python SLP builder with arbitrary-$n$ Karatsuba splitting, folded sign chains, and CSE further reduces the concrete crossover to $\zmax(880) \ge 883$ at $m = 21$ and $\zmax(942) \ge 1{,}059$ at $m = 23$.)
+
+\subsection{Division-Free Sch\"onhage--Nussbaumer FFT and Refutation of All $c < 2$}
+To compute negacyclic convolution of length $N = 2^k$ over $R = \Z[x]$ without divisions, we recurse for $k \ge 4$ (base case $k \le 3$ via schoolbook in $3 \cdot 4^k$ gates, uniform scale $2^0 = 1$): write $N = K \cdot M$ with $p = \lfloor k/2 \rfloor$, $K = 2^p$, $M = 2^{k-p}$, and $L = 2M = 2^{\lceil k/2 \rceil + 1} < N$ (strictly smaller for all $k \ge 4$). In the ring $S := R[Z]/(Z^L + 1)$, the monomial $\zeta = Z^{\mathrm{step}}$ with $\mathrm{step} = L/K \in \{2, 4\}$ satisfies $\zeta^K = Z^L = -1$, so $\omega = \zeta^2$ satisfies $\omega^{K/2} = -1$.
+\begin{enumerate}[label=(\roman*),leftmargin=1.8em]
+  \item Split $a, b$ into $K$ chunks of length $M$ zero-padded to $L$, and twist chunk $j$ by $\zeta^j$ (cyclic shift + sign flip: $\le L$ gates per chunk).
+  \item Apply Cooley--Tukey cyclic DFT of size $K$ over $S$ using $\omega = Z^{2\cdot\mathrm{step}}$ (Lean: \code{canBuild\_ringDFT}, cost $\le 3 p K L$ gates).
+  \item Perform $K$ recursive Sch\"onhage--Nussbaumer multiplications of length $L$ (uniform scale $2^{e(k')}$).
+  \item Apply the \emph{same} DFT with angle $2 \cdot \mathrm{step} \cdot (K - 1)$ (exact inverse without dividing by $K$, scaling output by $K = 2^p$; Lean: \code{ringDFT\_inversion}, \code{ringDFT\_convolution}).
+  \item Untwist by $\zeta^{2K - j}$ and recombine overlapping halves of length $M$ (Lean: \code{negConv\_chunk\_recombine}).
+\end{enumerate}
+The total uniform positive scale is $2^{e(k') + p}$, and strong induction yields $\mathrm{snCost}(k) \le 200\, k(\lfloor \log_2 k \rfloor + 1)\, 2^k$ (Lean: \code{snCost\_le}). Combining with Proposition~\ref{prop:chirp} at $N_{\mathrm{fft}} = 2m = 2^{k+1}$ gives:
+
+\begin{theorem}[Unconditional Refutation of Every $c < 2$; Lean: \code{tau\_subquadratic\_growth}, \code{tau\_refutes\_subquadratic}]\label{thm:subquad}
+For every $k \ge 2$,
+\[
+  \zmax\bigl(2000\, k(\lfloor \log_2 k \rfloor + 1)\, 2^k\bigr) \;\ge\; 2 \cdot 4^k + 1.
+\]
+Consequently, $\zmax(\tau) = \Omega\!\left(\tau^2 / (\log^2 \tau \cdot (\log\log \tau)^2)\right)$, and for every real $c < 2$ there is no $a \in \R$ such that $\zZ(f) \le a(\tau(f) + 1)^c$ for all nonzero $f \in \Z[x]$.
+\end{theorem}
+
+\begin{remark}[Consecutive Integer Roots]
+In Python we also verified a completely division-free version of Bostan--Gaudry--Schost~\cite{BGS2007} value-shift doubling ($d \to 2d$ via three pure positive-integer shifts $\delta \in \{d+1, 2d+2, 3d+3\}$ using $O(d)$ prefix-suffix products and sliding-window products, e.g.\ $256$ consecutive roots $\{0, \dots, 255\}$ in $\tau = 1{,}715$ gates). Paired with Sch\"onhage--Nussbaumer multiplication, this achieves the same asymptotic bound $\Omega(\tau^2 / (\log^2\tau (\log\log\tau)^2))$ using consecutive integer roots.
+\end{remark}
+
+\section{Unconditional Upper Bound Beating $2^{\tau - 1}/\tau$ Over $\R$}\label{sec:upper}
+
+Every constant-free $\tau$-gate SLP with $a$ addition/subtraction gates and $\tau - a$ multiplications satisfies $\deg(f) \le 2^{\tau - a}$ and $\log_2 \|f\|_1 \le a \cdot 2^{\tau - a}$. By Landau's inequality, $\lfloor (z-1)/2 \rfloor!\lfloor z/2 \rfloor! \le M(f) \le \|f\|_1$, yielding the Mahler baseline $\zmax(\tau) \le (1 + o(1)) 2^{\tau-1}/\tau$. We improve this unconditionally for full DAG SLPs---even for all real roots:
+
+\begin{theorem}[Sharpened Real-Root Upper Bound for DAG SLPs]\label{thm:bs}
+Every nonzero $f \in \R[x]$ computed by a DAG SLP with $a$ addition/subtraction gates satisfies
+\[
+  z_{\R}(f) \;\le\; 3 + \sum_{r=2}^a 2^r \cdot \frac{e^2 + 3}{4}\, 2^{\binom{r-1}{2}} (r - 1)^{r-1}.
+\]
+Balancing with $\deg(f) \le 2^{\tau - a}$ at $a^* = \sqrt{2\tau} - O(\log \tau)$ gives unconditionally
+\[
+  \zmax(\tau) \;\le\; \zmax^{\R}(\tau) \;\le\; 2^{\tau - (\sqrt{2} - o(1))\sqrt{\tau}} \;=\; o\!\left(\frac{2^{\tau-1}}{\tau}\right).
+\]
+\end{theorem}
+
+\begin{proof}
+Delete identically zero addition gates and fold $M \pm 0$ (non-increasing $a$). Let $y_0 = x$ and $y_1, \dots, y_a \not\equiv 0$ be the remaining addition/subtraction gates in topological order, with $y_j = M_j + s_j N_j$ ($s_j \in \{\pm 1\}$) where $M_j, N_j$ are nonzero monomials in $(y_0, \dots, y_{j-1})$, so $f = \prod_{r=0}^a y_r^{e_r}$. Every real root $x_0$ of $f$ is either $0$ ($\le 1$ root) or belongs to $Z_r := \{x_0 \in \R : y_r(x_0) = 0,\ \prod_{j < r} y_j(x_0) \neq 0\}$ for a unique minimal $r \ge 1$. For $r = 1$, $y_1 = x^p \pm x^q$ gives $|Z_1| \le 2$.
+
+Fix $r \ge 2$ with $Z_r \neq \emptyset$. On $U := \{x \in \R : \prod_{j < r} y_j(x) \neq 0\}$, $N_j(x) \neq 0$ for all $j \le r$, so $y_r(x) = 0 \iff h(x) := M_r(x)/N_r(x) = -s_r$. Because $Z_r \neq \emptyset$ and $y_r \not\equiv 0$, $h$ is a nonconstant rational function. Choosing generic small $\varepsilon > 0$ avoiding the finitely many critical values of $h$, every odd-multiplicity root in $Z_r$ splits into one simple root for each sign $\pm\varepsilon$ and every even-multiplicity root splits into two simple roots for one sign and zero for the other, so $|Z_r| \le \max_{\pm} |U_r(\pm\varepsilon)|$ where $U_r(\pm\varepsilon) := \{x \in U : h(x) = -s_r \pm \varepsilon\}$.
+
+Each $x \in U_r(\pm\varepsilon)$ gives a point $p = (x, y_1(x), \dots, y_{r-1}(x)) \in (\R^*)^r$ solving the normalized $r \times r$ Laurent system
+\[
+  F_j := y_j N_j^{-1} - M_j N_j^{-1} - s_j = 0 \quad (1 \le j \le r-1), \qquad
+  F_r := M_r N_r^{-1} - c = 0 \quad (c = -s_r \pm \varepsilon \neq 0).
+\]
+By lower-triangular Schur complement, $\det J_F(p) = \pm \bigl(\prod_{j=1}^r N_j(p)\bigr)^{-1} N_r(p)\, h'(x) \neq 0$, so every solution is strictly nondegenerate. In each of the $2^r$ orthants $y_i = \sigma_i z_i$ ($z_i > 0$), $F_r = 0$ is a binomial $z^v = |c|$ with $v \in \Z^r \setminus \{0\}$. Solving for $z_{i_0}$ ($v_{i_0} \neq 0$) and substituting into $F_1, \dots, F_{r-1}$ preserves nondegeneracy (since $\partial F_r / \partial z_{i_0} = v_{i_0} c / z_{i_0} \neq 0$) and yields an $(r-1) \times (r-1)$ real-exponent system on $\R_+^{r-1}$ supported on at most $1 + 2(r-1) = (r-1) + (r-1) + 1$ distinct monomials ($n = r - 1$, $l \le r - 1$). Applying Bihan--Sottile~\cite[Theorem~1]{BihanSottile2007} per orthant yields $|Z_r| \le 2^r \cdot \frac{e^2+3}{4}\, 2^{\binom{r-1}{2}} (r-1)^{r-1}$.
+\end{proof}
+
+Table~\ref{tab:upper} compares $\log_2$ of the baseline Mahler bound $2^{\tau-1}/\tau$, Theorem~\ref{thm:bs} (combined with the refined Mahler bound $\log_2\|f\|_1 \le a \cdot 2^{\tau-a}$), and peer-reviewed Rojas~\cite{Rojas2002} ($2^{\tau - (1-o(1))\tau/\log_2\tau}$, noted with the caveat that verbatim DAG-vs-formula equivalence in LNCS~2369 should be checked independently).
+
+\begin{table}[ht]
+\centering
+\small
+\caption{Comparison of $\log_2$ upper bounds on $\zmax(\tau)$ across $\tau = 15 \dots 10{,}000$. Theorem~\ref{thm:bs} (self-contained for full DAG SLPs) beats the baseline $2^{\tau-1}/\tau$ already at $\tau = 15$ (with Mahler) and $\tau = 50$ purely over $\R$.}
+\label{tab:upper}
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+$\tau$ & Baseline $2^{\tau-1}/\tau$ & Thm.~\ref{thm:bs} (pure $\R$) & Thm.~\ref{thm:bs} + Mahler & $a^*_{\mathrm{BS}}$ & Rojas~\cite{Rojas2002} \\
+\midrule
+15 & 10.09 & 11.00 & \textbf{10.07} & 4 & 10.92 \\
+20 & 14.68 & 15.00 & \textbf{13.81} & 5 & 14.94 \\
+50 & 43.36 & \textbf{42.00} & \textbf{39.78} & 8 & 41.30 \\
+100 & 92.36 & \textbf{89.00} & \textbf{86.07} & 11 & 85.21 \\
+1,000 & 989.03 & \textbf{960.00} & \textbf{955.43} & 40 & 904.71 \\
+10,000 & 9,985.71 & \textbf{9,865.00} & \textbf{9,858.81} & 135 & 9,265.34 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Unconditional $2$-Adic Exponential Lower Bound and Local-vs-Global Barrier}\label{sec:padic}
+
+\begin{theorem}[$2$-Adic Exponential Lower Bound; Lean: \code{tau\_padic\_two\_pow}]\label{thm:padic}
+Define $P_0(x) = x^2 - 1$, $c_1 = 64 = 2^6$, and for $n \ge 1$, $c_{n+1} = 64 c_n^2$ and $P_{n+1}(x) = P_n(x)^2 - c_{n+1}$. Then for every $k \ge 2$, $P_{k-1} \in \Z[x]$ is monic of degree $2^k$, has constant-free SLP length $\tau(P_{k-1}) \le 4k$, and admits at least $2^k$ distinct roots in the $2$-adic integers $\Z_2$.
+\end{theorem}
+
+\begin{proof}
+Write $c_n = 2^{2 e_n}$ where $e_1 = 3$ and $e_{n+1} = 2e_n + 3$. By Hensel's lemma on $F(u) = u^2 - (1 + 8t)$ at $u_0 = 1$ ($\|F(1)\|_2 \le \frac{1}{8} < \frac{1}{4} = \|F'(1)\|_2^2$), every $1 + 8t \in \Z_2$ has a square root $u \in \Z_2$ with $u \neq -u$. By induction on $n$, for every $t \in \Z_2$ there exists a set $S \subset \Z_2$ of cardinality $2^{n+1}$ such that $P_n(r) = 2^{e_{n+1}} t$ for all $r \in S$: at $n = 0$, take $\{\pm\sqrt{1+8t}\}$; at $n+1$, solve $u^2 = 1 + 8t$ and take the disjoint union of the preimages for $+u$ and $-u$ (disjoint since $2^{e_{n+1}} \neq 0$ and $u \neq -u$). Setting $t = 0$ yields $2^{n+1}$ distinct roots of $P_n$ in $\Z_2$. The SLP uses $8$ gates for $P_1$ and $4$ gates per step ($c_n^2$, $64 c_n^2$, $P_n^2$, $P_n^2 - c_{n+1}$).
+\end{proof}
+
+More generally, replacing $8$ by $M = 8 \prod_{p \in S \setminus \{2\}} p$ gives $2^{\lfloor(\tau - O(\log M))/4\rfloor}$ distinct roots \emph{simultaneously in $\Z_p$ for every $p \in S$}, for any finite set of finite primes $S$. Together with Chebyshev polynomials over $\R$ ($2^{(\tau-1)/2}$) and $x^{2^{\tau-1}} - 1$ over $\F_p$ ($2^{\tau-1}$), this yields a sharp structural barrier:
+
+\begin{corollary}[Local-vs-Global Barrier]
+No purely Archimedean ($\R$), purely non-Archimedean ($\Q_p$ or finite product $\prod_{p \in S} \Z_p$), or purely finite-field ($\F_p$) argument can prove $\zmax(\tau) = 2^{o(\tau)}$ or resolve the Shub--Smale $\tau$-conjecture. Any proof of subexponential or polynomial bounds for $\zmax(\tau)$ must combine global (adelic / product-formula) information across $\infty$ and infinitely many primes.
+\end{corollary}
+
+\section{Why Breaking $c = 2$ (and Settling \code{IIS-O-1205} in Full) Remains Open}
+
+Two October 2026 preprints---Zhang \& Xuan~\cite{ZhangXuan2026} (unconditional $\tau(m_k k!) \le \exp(O((\log k)^{2/3}(\log\log k)^{1/3}))$ via genus-$2$ Jacobians) and Zhang~\cite{Zhang2026} ($\exp(O(\sqrt{\log k \log\log k}))$ under a zero-free strip of $\zeta(s)$), extending Cheng~\cite{Cheng2004}---already break the $\sqrt{k}$ barrier for \emph{scalar integer} factorial multiples. However, lifting smooth-order algebraic-group circuits from $\Z$ to $\Z[x]$ hits a fundamental \textbf{characteristic-$0$ torsion obstruction}:
+\begin{itemize}[leftmargin=1.5em]
+  \item Over $\Z$, evaluating modulo a prime $p$ lands in the \emph{finite field} $\F_p$, where group orders $\#\mathcal{G}_t(\F_p) \approx p$ can be $B$-smooth and killed by $E = \mathrm{lcm}(1, \dots, B)$.
+  \item Over $\Z[x]$, evaluating at an integer root $r \in \Z$ quotients by $(x - r)$ into $\Z[x]/(x - r) \cong \Z \subset \Q$ (characteristic $0$, infinite), so vanishing of the projective denominator $D_E(r) = 0$ forces $P(r) \in \mathcal{G}_r(\Q)_{\mathrm{tors}}$.
+  \item For $g = 1$ (elliptic curves), Mazur's uniform torsion theorem guarantees that \emph{even for varying elliptic families $E_{x,\tau}$}, every rational torsion point has order dividing $E_0 = \mathrm{lcm}(1 \dots 10, 12) = 2520$, so smooth multipliers $E \gg 2520$ create strictly zero additional rational roots beyond $[2520] P_\tau(x) = \mathcal{O}$.
+  \item For $g \ge 2$, fixed curves in their Jacobian have finite torsion intersection over $\bar{\Q}$ by Raynaud's Theorem (Manin--Mumford), and fixed non-isotrivial families have finite rational torsion locus by Masser's specialization theorem (1989); ruling out varying genus-$2$ families unconditionally reduces to the open Uniform Boundedness Conjecture for $|J(\Q)_{\mathrm{tors}}|$.
+\end{itemize}
+Similarly, generic $2$-level baby-step/giant-step multipoint evaluation caps at $m D / (D + m)^2 \le 1/4$ without an algebraic group addition law (routing back to characteristic-$0$ torsion), while fixed inner compositions $H(Q(x))$ increase root count by at most $2 + O_Q(1)$.
+
+\section{Lean~4.36.0 Formalization Artifact}\label{sec:lean}
+
+All constructions and proofs of Theorems~\ref{thm:cross}, \ref{thm:subquad}, and \ref{thm:padic} are formalized in Lean~4.36.0 + Mathlib~v4.36.0 under \code{Research/PvsNP/Tau/} (Table~\ref{tab:lean_new}), compiling with zero \code{sorryAx}, zero \code{native\_decide}, and strictly $\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$.
+
+\begin{table}[ht]
+\centering
+\small
+\caption{New Lean~4.36.0 formalization modules ($4{,}000$ LOC, $89$ theorems, zero \code{sorryAx}, strictly standard axioms).}
+\label{tab:lean_new}
+\begin{tabularx}{\textwidth}{@{}l r r X@{}}
+\toprule
+Module & LOC & Thms & Headline Machine-Verified Declarations \\
+\midrule
+\code{ChirpZ.lean} & 1,624 & 43 & \code{CanBuild}, \code{q\_binomial\_fraction\_free}, \code{chirp\_middle\_product\_eq}, \code{chirp\_poly\_root\_count}, \code{zMaxGe\_of\_chirp\_engine}, \code{canBuild\_karatsuba}, \code{tau\_karatsuba\_growth}, \code{tau\_refutes\_linear}. \\
+\addlinespace[3pt]
+\code{SubquadraticRefutation.lean} & 2,100 & 40 & \code{negConv}, \code{negShift}, \code{ringDFT\_inversion}, \code{ringDFT\_convolution}, \code{canBuild\_ringDFT}, \code{negConv\_chunk\_recombine}, \code{canBuild\_snMul}, \code{snCost\_le}, \code{tau\_subquadratic\_growth}, \code{tau\_refutes\_subquadratic}, \code{canBuild\_karaMid}, \code{tau\_crossover\_1884\_2049}, \code{tau\_exists\_roots\_gt\_gates}. \\
+\addlinespace[3pt]
+\code{PadicBarrier.lean} & 276 & 6 & \code{padicSLP}, \code{padicInt\_exists\_sqrt\_one\_add\_eight}, \code{padicPoly\_preimages}, \code{tau\_padic\_two\_pow}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{thebibliography}{15}
+\bibitem{ShubSmale1995} M.~Shub and S.~Smale, \emph{On the intractability of Hilbert's Nullstellensatz and an algebraic version of ``$\mathrm{NP} \neq \mathrm{P}$?''}, Duke Math.\ J.\ \textbf{81} (1995), 47--54.
+\bibitem{Smale1998} S.~Smale, \emph{Mathematical problems for the next century}, Math.\ Intelligencer \textbf{20} (1998), 7--15.
+\bibitem{Burgisser2009} P.~B\"urgisser, \emph{On defining integers and proving arithmetic circuit lower bounds}, Comput.\ Complexity \textbf{18} (2009), 81--103.
+\bibitem{Strassen1976} V.~Strassen, \emph{Einige Resultate \"uber Berechnungskomplexit\"at}, Jahresber.\ DMV \textbf{78} (1976), 1--8.
+\bibitem{PatersonStockmeyer1973} M.~S.~Paterson and L.~J.~Stockmeyer, \emph{On the number of nonscalar multiplications necessary to evaluate polynomials}, SIAM J.\ Comput.\ \textbf{2} (1973), 60--66.
+\bibitem{CantorKaltofen1991} D.~G.~Cantor and E.~Kaltofen, \emph{On fast multiplication of polynomials over arbitrary algebras}, Acta Inform.\ \textbf{28} (1991), 693--701.
+\bibitem{Rojas2002} J.~M.~Rojas, \emph{Additive complexity and the roots of polynomials over number fields and $p$-adic fields}, ANTS~V, LNCS \textbf{2369} (2002), 506--515.
+\bibitem{Cheng2004} Q.~Cheng, \emph{On the ultimate complexity of factorials}, Theoret.\ Comput.\ Sci.\ \textbf{326} (2004), 419--429.
+\bibitem{BGS2007} A.~Bostan, P.~Gaudry, and \'E.~Schost, \emph{Linear recurrences with polynomial coefficients and application to integer factorization and Cartier--Manin operator}, SIAM J.\ Comput.\ \textbf{36} (2007), 1777--1806.
+\bibitem{BihanSottile2007} F.~Bihan and F.~Sottile, \emph{New fewnomial upper bounds from Gale dual polynomial systems}, Moscow Math.\ J.\ \textbf{7} (2007), 387--407.
+\bibitem{BMR2013} B.~Borchert, P.~McKenzie, and K.~Reinhardt, \emph{Few-product polynomials}, Chicago J.\ Theor.\ Comput.\ Sci.\ (2013), Article~3.
+\bibitem{BostanYurkevich2022} A.~Bostan and S.~Yurkevich, \emph{Fast computation of $q$-factorials}, arXiv:2012.08656 (2020/2022).
+\bibitem{SantibanezLeal2026} F.~Santiba\~{n}ez-Leal, \emph{The Bottom of the Shub--Smale Tau Conjecture}, Zenodo (August/September 2026).
+\bibitem{ZhangXuan2026} L.~Zhang and J.~Xuan, \emph{Unconditional subexponential arithmetic circuits for positive factorial multiples}, arXiv:2610.28338 (October 2026).
+\bibitem{Zhang2026} L.~Zhang, \emph{Square-root logarithmic bounds for the arithmetic complexity of factorial multiples}, arXiv:2610.36588 (October 2026).
+\bibitem{Osprey2026Census} 0xOsprey, \emph{Exact-CRT Certification of $\zmax(9) = 6$ and $\zmax(10) = 7$, Record Witnesses up to $\tau = 18$, and Lean~4 Soundness Proofs for the Shub--Smale $\tau$-Conjecture}, \code{iis:2611.00113} (November 2026).
+\end{thebibliography}
+
+\end{document}

@@ -8,7 +8,12 @@
 
 ## TL;DR
 
-- **Exact new values:** Extending Santibáñez-Leal's 2026 census $`z_{\max}(1\dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)`$, we establish over **all of $`\mathbb{Z}`$** (no root-magnitude cutoff, zero hash-collision reliance):
+- **NEW — Unconditional Lean 4 refutation of every sub-quadratic exponent $`c < 2`$:** Using a fraction-free Chirp-$`z`$ $`q`$-Pochhammer SLP and division-free Schönhage–Nussbaumer negacyclic FFT over $`\mathbb{Z}[x]`$, we prove completely inside Lean 4 (`tau_refutes_subquadratic`, `tau_subquadratic_growth`, `tau_crossover_1884_2049`):
+  ```math
+  z_{\max}(\tau) = \Omega\!\left(\frac{\tau^2}{\log^2 \tau \cdot (\log\log \tau)^2}\right), \qquad z_{\max}(1884) \ge 2049 > 1884,
+  ```
+  unconditionally refuting $`c = 1`$ and every real $`c < 2`$ in [`IIS-O-1205`](https://isitsolved.com/open/IIS-O-1205), alongside a Lean-verified $`2`$-adic exponential lower bound (`tau_padic_two_pow`: $`z_{\max}^{\mathbb{Z}_2}(4k) \ge 2^k`$) establishing a Local-vs-Global barrier and an unconditional real-root upper bound $`z_{\max}(\tau) \le 2^{\tau - (\sqrt{2}-o(1))\sqrt{\tau}}`$. See [`paper/tau_subquadratic_refutation.pdf`](paper/tau_subquadratic_refutation.pdf).
+- **Exact finite-$`\tau`$ census:** Extending Santibáñez-Leal's 2026 census $`z_{\max}(1\dots 8) = (1, 2, 3, 3, 4, 5, 5, 6)`$, we establish over **all of $`\mathbb{Z}`$** (no root-magnitude cutoff, zero hash-collision reliance; published at [`iis:2611.00113`](https://isitsolved.com/journal/39b8a928ed68)):
   ```math
   z_{\max}(1 \dots 10) = (1, 2, 3, 3, 4, 5, 5, 6, 6, 7), \qquad z_{\max}(11) \ge 8.
   ```
@@ -116,9 +121,9 @@ Proved in Lean 4 (`bounded_mult_exact_sharpness_four`) that the trivial degree c
 </details>
 
 <details>
-<summary><strong>4. Lean 4.36.0 Modules (8 modules, 4,228 LOC, 204 theorems/lemmas, 0 sorry)</strong></summary>
+<summary><strong>4. Lean 4.36.0 Modules (11 modules, 8,228 LOC, 293 theorems/lemmas, 0 sorry)</strong></summary>
 
-Independently built & verified at [isitsolved.com/lean/receipts/31455fc47d7b](https://isitsolved.com/lean/receipts/31455fc47d7b):
+Independently built & verified at [isitsolved.com/lean/receipts/31455fc47d7b](https://isitsolved.com/lean/receipts/31455fc47d7b) (plus new receipt for the 3 asymptotic modules below):
 
 - [`Research/PvsNP/Tau/TauConjecture.lean`](Research/PvsNP/Tau/TauConjecture.lean) (344 LOC) — Constant-free `SLP`, `ShubSmaleTauConjecture`, degree & multiplication root bounds, computable `zMaxGe_of_evalInt` witness certifier.
 - [`Research/PvsNP/Tau/TauWitnesses.lean`](Research/PvsNP/Tau/TauWitnesses.lean) (114 LOC) — Verified witnesses for $`\tau = 6, 10, 11, 13`$ and 2-multiplication bound.
@@ -128,6 +133,9 @@ Independently built & verified at [isitsolved.com/lean/receipts/31455fc47d7b](ht
 - [`Research/PvsNP/Tau/FoldingRecords.lean`](Research/PvsNP/Tau/FoldingRecords.lean) (350 LOC) — Zero-multiplication addition chains, exact sharpness for $`m = 4`$ (`16` roots), and records for $`\tau = 16, 17, 18`$.
 - [`Research/PvsNP/Tau/Canonical.lean`](Research/PvsNP/Tau/Canonical.lean) (1,844 LOC) — Formal soundness of all canonicalization and dead-gate pruning rules (`exists_canonical`, `deadgate_count_bound`, `unusedWires_last_gate`, `zmax9_le_six_of_checklist`, `zmax10_le_seven_of_checklist`).
 - [`Research/PvsNP/Tau/CertSoundness.lean`](Research/PvsNP/Tau/CertSoundness.lean) (983 LOC) — Formal soundness of degree propagation, atomic product-mask union bound, dual-number modular evaluation, Taylor-stripped modular certificate, hash-mismatch inequality, and exact CRT zero certification.
+- [`Research/PvsNP/Tau/ChirpZ.lean`](Research/PvsNP/Tau/ChirpZ.lean) (1,624 LOC) — Compositional `CanBuild` SLP framework, fraction-free $`q`$-binomial theorem, Bluestein Chirp-$`z`$ identity, division-free Karatsuba multiplication, `tau_karatsuba_growth`, and `tau_refutes_linear`.
+- [`Research/PvsNP/Tau/SubquadraticRefutation.lean`](Research/PvsNP/Tau/SubquadraticRefutation.lean) (2,100 LOC) — Division-free Schönhage–Nussbaumer negacyclic FFT over $`\mathbb{Z}[x]`$, `tau_subquadratic_growth`, `tau_refutes_subquadratic` (all real $`c < 2`$), and concrete finite crossover `tau_crossover_1884_2049` (`zMaxGe 1884 2049`).
+- [`Research/PvsNP/Tau/PadicBarrier.lean`](Research/PvsNP/Tau/PadicBarrier.lean) (276 LOC) — Explicit length-$`4k`$ SLP family and Hensel preimage tree proving `tau_padic_two_pow` ($`2^k`$ distinct roots in $`\mathbb{Z}_2`$).
 
 </details>
 
